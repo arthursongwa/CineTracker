@@ -358,7 +358,7 @@
       </div>
     </div>
     <button class="settings-btn" id="btnSettings">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l-.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
       Réglages / Import
     </button>
   </header>
@@ -764,7 +764,8 @@
       addedAt: raw.addedAt || Date.now(),
       updatedAt: raw.updatedAt || raw.addedAt || Date.now(),
       nextEpisodeDate: raw.nextEpisodeDate || null,
-      releaseDate: raw.releaseDate || raw.release_date || raw.first_air_date || null
+      releaseDate: raw.releaseDate || raw.release_date || raw.first_air_date || null,
+      similar: raw.similar || []
     };
   }
 
@@ -1247,24 +1248,32 @@
     const videos = (d.videos && d.videos.results) || [];
     let trailer = videos.find(v => v.type === 'Trailer' && v.site === 'YouTube') || videos.find(v => v.site === 'YouTube');
 
-    // Solution de repli si TMDB ne trouve aucun trailer officiel : recherche propre sur YouTube
     let youtubeSearchFallbackKey = null;
     if(!trailer){
       youtubeSearchFallbackKey = `YT_SEARCH:${d.title || d.name || ''} bande annonce`;
     }
 
-    // Récupération des films similaires (3 ou 4)
-    const similarPool = [...(d.similar?.results || []), ...(d.recommendations?.results || [])];
+    // Récupération intelligente des films similaires (avec secours sur les tendances si vide)
+    let similarPool = [...(d.similar?.results || []), ...(d.recommendations?.results || [])];
+    
+    if(similarPool.length === 0 && state.apiKey){
+      try {
+        const trendRes = await fetch(`${TMDB_BASE}/trending/${mediaType}/week?api_key=${encodeURIComponent(state.apiKey)}&language=fr-FR`);
+        const trendData = await trendRes.json();
+        similarPool = trendData.results || [];
+      } catch(err){/* silencieux */}
+    }
+
     const uniqueSimilar = [];
     const seenSimIds = new Set();
     for(const sim of similarPool){
-      if(!seenSimIds.has(sim.id) && sim.id !== d.id && sim.poster_path){
+      if(!seenSimIds.has(sim.id) && sim.id !== d.id && (sim.poster_path || sim.backdrop_path)){
         seenSimIds.add(sim.id);
         uniqueSimilar.push({
           id: sim.id,
           mediaType: sim.media_type || mediaType,
           title: sim.title || sim.name || 'Sans titre',
-          posterPath: sim.poster_path
+          posterPath: sim.poster_path || sim.backdrop_path
         });
       }
       if(uniqueSimilar.length >= 4) break;
@@ -1413,7 +1422,7 @@
       selectedMovie.updatedAt = Date.now();
       updateStarUI(selectedMovie.userRating);
       await saveCurrentMovieState();
-      renderTop10(); // Met à jour instantanément les étoiles dans le Top 10
+      renderTop10();
     });
   });
 
@@ -1438,7 +1447,7 @@
       state.library[idx] = normalizeMedia({ ...state.library[idx], ...selectedMovie });
       await persist();
       renderLibrary();
-      renderTop10(); // Assure la synchro immédiate avec le Top 10
+      renderTop10();
     }
   }
 
@@ -1481,7 +1490,7 @@
   });
 
   /* =========================================================
-     TRAILER PLAYER (AVEC REPLI YOUTUBE PROPRE)
+     TRAILER PLAYER
   ========================================================= */
   function resetTrailerUI(){
     const wrap = el('trailerWrap');
