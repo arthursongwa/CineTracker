@@ -247,10 +247,6 @@
 
   /* Bloc Films Similaires harmonisé avec le design des cartes de la collection */
   .similar-section{
-    /* background:var(--color-background-card); */
-    /* border:1px solid var(--color-border-subtle);
-    border-radius:var(--radius-outer-card); */
-    /* padding:var(--spacing-2xl) var(--spacing-3xl); */
     margin-bottom:var(--spacing-5xl);
     display:none;
   }
@@ -271,7 +267,6 @@
     padding:4px 2px 10px;
     scroll-snap-type:x proximity;
   }
-  /* Utilisation exacte de la structure lib-card pour la cohérence visuelle */
   .similar-card{
     scroll-snap-align:start;
     flex:0 0 150px;
@@ -311,6 +306,41 @@
     font-size:11px;
     color:var(--color-text-secondary);
     margin-top:2px;
+  }
+
+  /* Panneau des curseurs de paramètres de recommandation */
+  .reco-controls-panel{
+    background:var(--color-background-card);
+    border:1px solid var(--color-border-subtle);
+    border-radius:var(--radius-card);
+    padding:var(--spacing-xl);
+    margin-bottom:var(--spacing-2xl);
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+    gap:var(--spacing-lg);
+  }
+  .reco-control-group{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .reco-control-group label{
+    font-family:var(--font-bricolage);
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:var(--color-text-secondary);
+    display:flex;
+    justify-content:space-between;
+  }
+  .reco-control-group label span{
+    color:var(--color-accent-gold);
+  }
+  .reco-control-group input[type="range"]{
+    accent-color:var(--color-accent-gold);
+    cursor:pointer;
+    width:100%;
   }
 
   /* ============ TOP 10 ============ */
@@ -417,7 +447,7 @@
       </div>
     </div>
     <button class="settings-btn" id="btnSettings">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l-.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
       Réglages / Import
     </button>
   </header>
@@ -568,7 +598,7 @@
       </div>
     </div>
 
-    <!-- Section Films Similaires positionnée dehors en dessous du bloc Hero avec un design harmonisé -->
+    <!-- Section Films Similaires positionnée dehors en dessous du bloc Hero -->
     <div class="similar-section" id="similarSection">
       <div class="similar-title">Films & Séries similaires</div>
       <div class="similar-strip" id="similarStrip"></div>
@@ -634,14 +664,37 @@
       <div>
         <div class="section-eyebrow">Découverte intelligente</div>
         <h2 class="section-title">Recommandations pour toi</h2>
-        <div class="section-sub">Basé sur les genres de tes coups de cœur (4-5 étoiles).</div>
+        <div class="section-sub">Ajuste les curseurs pour affiner les critères du moteur de reco.</div>
       </div>
       <div class="section-actions">
-        
-        <button class="btn-ghost small" id="btnRecoAutoTune">🎯 Optimiser mes recos</button>
-        <span id="recoTuneStatus" class="section-sub"></span>
+        <button class="btn-ghost small" id="btnRecoRefresh">↻ Générer de nouvelles recos</button>
       </div>
     </div>
+
+    <!-- Panneau des curseurs de paramètres de recommandation -->
+    <div class="reco-controls-panel">
+      <div class="reco-control-group">
+        <label for="weightText">Synopsis (Similitude) <span id="valText">0.28</span></label>
+        <input type="range" id="weightText" min="0" max="1" step="0.05" value="0.28">
+      </div>
+      <div class="reco-control-group">
+        <label for="weightGenre">Affinité de genres <span id="valGenre">0.26</span></label>
+        <input type="range" id="weightGenre" min="0" max="1" step="0.05" value="0.26">
+      </div>
+      <div class="reco-control-group">
+        <label for="weightEra">Proximité d'époque <span id="valEra">0.08</span></label>
+        <input type="range" id="weightEra" min="0" max="1" step="0.05" value="0.08">
+      </div>
+      <div class="reco-control-group">
+        <label for="weightQuality">Note TMDB (Qualité) <span id="valQuality">0.12</span></label>
+        <input type="range" id="weightQuality" min="0" max="1" step="0.05" value="0.12">
+      </div>
+      <div class="reco-control-group">
+        <label for="weightDirector">Réalisateur <span id="valDirector">0.14</span></label>
+        <input type="range" id="weightDirector" min="0" max="1" step="0.05" value="0.14">
+      </div>
+    </div>
+
     <div id="recoGrid" class="reco-grid"></div>
   </section>
 
@@ -718,8 +771,7 @@
     dismissedReco: [],
     disliked: [],
     calendarCache: {},
-    bugs: [],
-    recoWeights: null
+    bugs: []
   };
 
   let searchResults = [];
@@ -869,7 +921,6 @@
         state.apiKey = parsed.apiKey || "";
         state.top10 = parsed.top10 || { movie: [], tv: [], anime: [] };
         state.dismissedReco = parsed.dismissedReco || [];
-        if(parsed.recoWeights) applyWeights(parsed.recoWeights);
         state.disliked = parsed.disliked || [];
         state.calendarCache = parsed.calendarCache || {};
         state.bugs = parsed.bugs || [];
@@ -1353,7 +1404,7 @@
         seenSimIds.add(sim.id);
         uniqueSimilar.push(sim);
       }
-      if(uniqueSimilar.length >= 7) break;
+      if(uniqueSimilar.length >= 6) break;
     }
 
     return normalizeMedia({
@@ -1379,10 +1430,8 @@
   async function selectMedia(tmdbId, mediaType){
     try{
       const existing = findInLibrary(tmdbId);
-      // Correction : Si le film est déjà dans la bibliothèque, on force un rafraîchissement des données (notamment pour récupérer les similaires même s'ils manquaient)
       const freshData = await fetchMediaData(tmdbId, mediaType || existing?.mediaType || 'movie');
       if(existing){
-        // Conserver les notes et statuts persos tout en mettant à jour les similar
         existing.similar = freshData.similar;
         selectedMovie = normalizeMedia(existing);
       } else {
@@ -1458,7 +1507,7 @@
       trailerBtn.style.display = 'none';
     }
 
-    // Rendu des films similaires harmonisés avec le design des cartes de la collection
+    // Rendu des 6 films similaires avec le design exact des cartes de la collection
     const simSection = el('similarSection');
     const simStrip = el('similarStrip');
     if(m.similar && m.similar.length > 0){
@@ -1721,34 +1770,8 @@
   }
 
   /* =========================================================
-     MOTEUR DE RECOMMANDATION HYBRIDE (retrieval + re-rank + MMR)
-     ---------------------------------------------------------
-     Étape 1 (retrieval)   : score rapide de tout le pool de
-       candidats — TF-IDF des synopsis, affinité de genres,
-       proximité d'époque, qualité bayésienne TMDB.
-     Étape 2 (re-ranking)  : enrichissement (réalisateur,
-       mots-clés) des ~40 meilleurs candidats seulement.
-     Étape 3 (diversification MMR) : réordonnancement pour
-       éviter 20 recos redondantes (même genre/réalisateur).
+     SYSTÈME DE RECOMMANDATION (AVEC PARAMÈTRES VIA CURSEURS)
   ========================================================= */
-
-  const RECO_WEIGHTS = {
-    text: 0.28,      // similarité TF-IDF des synopsis
-    genre: 0.26,     // affinité de genres (+ pénalité genres détestés)
-    era: 0.08,       // proximité d'époque
-    quality: 0.12,   // note TMDB bayésienne
-    director: 0.14,  // réalisateur/créateur apprécié (étape 2)
-    keywords: 0.12,  // mots-clés thématiques communs (étape 2)
-  };
-  const MMR_LAMBDA = 0.75;        // 1 = pertinence pure, 0 = diversité pure
-  const RETRIEVAL_POOL_SIZE = 70; // taille max du pool étape 1
-  const RERANK_POOL_SIZE = 40;    // nb de candidats enrichis en étape 2
-  const FINAL_RECO_COUNT = 20;
-  const MIN_VOTES_BAYESIAN = 80;  // "m" du score bayésien (évite les pépites à 2 votes)
-
-  /* -------------------------------------------------------------------------
-     1. UTILITAIRES TEXTE — TF-IDF maison (proxy de similarité sémantique)
-     ------------------------------------------------------------------------- */
   const FR_STOPWORDS = new Set(
     ("le la les un une des de du au aux et ou mais donc or ni car ce cet cette " +
      "ces son sa ses leur leurs mon ma mes ton ta tes notre nos votre vos qui " +
@@ -1756,7 +1779,7 @@
      "seront été être avoir a ont avait avaient dans sur sous par pour avec " +
      "sans entre vers chez plus moins très bien tout tous toute toutes comme " +
      "si ne pas jamais toujours quand alors ainsi cela ceci celui celle ceux " +
-     "celles lui y en d l s t qu n c j après avant deux trois").split(" ")
+     "celles lui y en d l s t qu n c j après avant deux three").split(" ")
   );
 
   function stripAccents(str){
@@ -1771,7 +1794,6 @@
       .filter(t => t.length > 2 && !FR_STOPWORDS.has(t));
   }
 
-  /** Construit l'IDF sur l'ensemble du corpus (bibliothèque notée + pool candidats). */
   function buildIdf(corpusTokenArrays){
     const df = new Map();
     corpusTokenArrays.forEach(tokens => {
@@ -1811,11 +1833,7 @@
     source.forEach((val, key) => target.set(key, (target.get(key) || 0) + val * weight));
   }
 
-  /* -------------------------------------------------------------------------
-     2. MOTS-CLÉS TMDB (avec cache, utilisés en étape 2 pour le re-ranking)
-     ------------------------------------------------------------------------- */
-  const KEYWORDS_CACHE = new Map(); // clé: "mediaType_id" -> [mots-clés]
-
+  const KEYWORDS_CACHE = new Map();
   async function fetchKeywords(id, mediaType){
     const cacheKey = `${mediaType}_${id}`;
     if(KEYWORDS_CACHE.has(cacheKey)) return KEYWORDS_CACHE.get(cacheKey);
@@ -1832,14 +1850,9 @@
     }
   }
 
-  /* -------------------------------------------------------------------------
-     3. PROFIL UTILISATEUR
-     Construit à partir de toute la bibliothèque notée (positif ET négatif).
-     ------------------------------------------------------------------------- */
   async function buildUserProfile(library, idf){
     const rated = library.filter(m => m.userRating > 0);
     const now = Date.now();
-
     const profile = {
       textVector: new Map(),
       genreWeights: new Map(),
@@ -1849,14 +1862,11 @@
       keywordWeights: new Map(),
       years: [],
     };
-
     const positiveForKeywords = [];
 
     rated.forEach(item => {
-      const centered = item.userRating - 3; // -2..+2 (3 = neutre)
+      const centered = item.userRating - 3;
       if(centered === 0) return;
-
-      // Les goûts récents comptent un peu plus (demi-vie ~24 mois)
       const ageMonths = Math.max(0, (now - (item.updatedAt || item.addedAt || now)) / (1000 * 60 * 60 * 24 * 30));
       const recencyBoost = 1 / (1 + ageMonths / 24);
       const weight = Math.abs(centered) * (0.6 + 0.4 * recencyBoost);
@@ -1864,33 +1874,26 @@
       if(centered > 0){
         const vec = tfIdfVector(tokenize(item.overview), idf);
         addWeightedVector(profile.textVector, vec, weight);
-
-        (item.genreIds || []).forEach(g =>
-          profile.genreWeights.set(g, (profile.genreWeights.get(g) || 0) + weight));
-
+        (item.genreIds || []).forEach(g => profile.genreWeights.set(g, (profile.genreWeights.get(g) || 0) + weight));
         if(item.director && item.director !== 'Inconnu'){
           profile.directorWeights.set(item.director, (profile.directorWeights.get(item.director) || 0) + weight);
         }
         if(item.year) profile.years.push({ y: parseInt(item.year, 10), w: weight });
-
         positiveForKeywords.push({ item, weight });
       } else {
-        (item.genreIds || []).forEach(g =>
-          profile.negativeGenres.set(g, (profile.negativeGenres.get(g) || 0) + weight));
+        (item.genreIds || []).forEach(g => profile.negativeGenres.set(g, (profile.negativeGenres.get(g) || 0) + weight));
         if(item.director && item.director !== 'Inconnu'){
           profile.negativeDirectors.set(item.director, (profile.negativeDirectors.get(item.director) || 0) + weight);
         }
       }
     });
 
-    // Mots-clés : on limite aux 15 favoris les plus "forts" pour économiser des appels API
     const topForKeywords = positiveForKeywords.sort((a, b) => b.weight - a.weight).slice(0, 15);
     await Promise.all(topForKeywords.map(async ({ item, weight }) => {
       const kws = await fetchKeywords(item.tmdbId, item.mediaType);
       kws.forEach(k => profile.keywordWeights.set(k, (profile.keywordWeights.get(k) || 0) + weight));
     }));
 
-    // Moyenne / écart-type pondérés des années aimées (pour la gaussienne d'époque)
     let yearMean = null, yearStd = 8;
     if(profile.years.length){
       const totW = profile.years.reduce((s, x) => s + x.w, 0);
@@ -1900,34 +1903,27 @@
     }
     profile.yearMean = yearMean;
     profile.yearStd = yearStd;
-
     return profile;
   }
 
-  /* -------------------------------------------------------------------------
-     4. FONCTIONS DE SCORE
-     ------------------------------------------------------------------------- */
   function genreAffinity(candGenreIds, profile){
     if(!candGenreIds || !candGenreIds.length || profile.genreWeights.size === 0) return 0;
-
     let profNorm = 0;
     profile.genreWeights.forEach(w => profNorm += w * w);
     let dot = 0;
     candGenreIds.forEach(g => { if(profile.genreWeights.has(g)) dot += profile.genreWeights.get(g); });
     const candNorm = Math.sqrt(candGenreIds.length);
     const positive = profNorm > 0 ? dot / (Math.sqrt(profNorm) * candNorm) : 0;
-
     let negNorm = 0;
     profile.negativeGenres.forEach(w => negNorm += w * w);
     let negDot = 0;
     candGenreIds.forEach(g => { if(profile.negativeGenres.has(g)) negDot += profile.negativeGenres.get(g); });
     const negative = negNorm > 0 ? negDot / (Math.sqrt(negNorm) * candNorm) : 0;
-
     return positive - 0.6 * negative;
   }
 
   function eraProximity(candidateYear, profile){
-    if(!profile.yearMean || !candidateYear || isNaN(candidateYear)) return 0.5; // neutre si pas d'info
+    if(!profile.yearMean || !candidateYear || isNaN(candidateYear)) return 0.5;
     const diff = candidateYear - profile.yearMean;
     return Math.exp(-(diff * diff) / (2 * profile.yearStd * profile.yearStd));
   }
@@ -1946,21 +1942,9 @@
     return (pos - 0.6 * neg) / maxPos;
   }
 
-  function keywordAffinity(candKeywords, profile){
-    if(!candKeywords || !candKeywords.length || profile.keywordWeights.size === 0) return 0;
-    const maxW = Math.max(...profile.keywordWeights.values());
-    let score = 0;
-    candKeywords.forEach(k => { if(profile.keywordWeights.has(k)) score += profile.keywordWeights.get(k); });
-    return score / (maxW * Math.sqrt(candKeywords.length));
-  }
-
-  /* -------------------------------------------------------------------------
-     5. ÉTAPE 1 — RETRIEVAL (pool + score léger)
-     ------------------------------------------------------------------------- */
   async function gatherCandidatePool(){
     const seen = new Set();
     const pool = [];
-
     function addItems(items, mediaTypeFallback){
       (items || []).forEach(it => {
         const id = it.id || it.tmdbId;
@@ -1984,13 +1968,10 @@
       });
     }
 
-    // (a) Signal quasi-collaboratif "gratuit" : les items TMDB déjà jugés
-    // similaires à tes coups de cœur, stockés dans library[].similar
     state.library.filter(m => m.userRating >= 4).forEach(m => {
       addItems((m.similar || []).map(s => ({ id: s.id, media_type: s.mediaType, title: s.title, poster_path: s.posterPath })));
     });
 
-    // (b) Découverte ciblée sur tes genres favoris (candidats de qualité)
     const genreCounts = new Map();
     state.library.filter(m => m.userRating >= 4).forEach(m => {
       (m.genreIds || []).forEach(g => genreCounts.set(g, (genreCounts.get(g) || 0) + m.userRating));
@@ -2009,7 +1990,6 @@
       });
     }
 
-    // (c) Tendances : garde une part d'exploration/découverte hors de ta bulle
     fetches.push(
       fetch(`${TMDB_BASE}/trending/all/week?api_key=${encodeURIComponent(state.apiKey)}&language=fr-FR&page=1`)
         .then(r => r.json())
@@ -2018,53 +1998,54 @@
     );
 
     await Promise.all(fetches);
-    return pool.slice(0, RETRIEVAL_POOL_SIZE);
+    return pool.slice(0, 70);
   }
 
-  function stage1Score(candidate, profile, idf, globalMeanVote){
+  function getDynamicWeights(){
+    return {
+      text: parseFloat(el('weightText')?.value ?? 0.28),
+      genre: parseFloat(el('weightGenre')?.value ?? 0.26),
+      era: parseFloat(el('weightEra')?.value ?? 0.08),
+      quality: parseFloat(el('weightQuality')?.value ?? 0.12),
+      director: parseFloat(el('weightDirector')?.value ?? 0.14),
+    };
+  }
+
+  function stage1Score(candidate, profile, idf, globalMeanVote, weights){
     const candVec = tfIdfVector(tokenize(candidate.overview), idf);
     const textSim = cosineSim(profile.textVector, candVec);
     const genreSim = genreAffinity(candidate.genre_ids, profile);
     const year = parseInt((candidate.release_date || candidate.first_air_date || '').slice(0, 4), 10);
     const era = eraProximity(year, profile);
-    const quality = bayesianQuality(candidate, globalMeanVote, MIN_VOTES_BAYESIAN) / 10;
+    const quality = bayesianQuality(candidate, globalMeanVote, 80) / 10;
 
-    const stage1 = RECO_WEIGHTS.text * textSim + RECO_WEIGHTS.genre * genreSim
-                 + RECO_WEIGHTS.era * era + RECO_WEIGHTS.quality * quality;
-
+    const stage1 = weights.text * textSim + weights.genre * genreSim
+                 + weights.era * era + weights.quality * quality;
     return { ...candidate, textSim, genreSim, era, quality, stage1 };
   }
 
-  /* -------------------------------------------------------------------------
-     6. ÉTAPE 2 — RE-RANKING (enrichissement réalisateur + mots-clés)
-     ------------------------------------------------------------------------- */
-  async function reRankTopCandidates(shortlist, profile){
+  async function reRankTopCandidates(shortlist, profile, weights){
     const enriched = await Promise.all(shortlist.map(async c => {
       try{
         const endpoint = c.media_type === 'tv' ? 'tv' : 'movie';
-        const res = await fetch(`${TMDB_BASE}/${endpoint}/${c.id}?api_key=${encodeURIComponent(state.apiKey)}&append_to_response=credits,keywords&language=fr-FR`);
+        const res = await fetch(`${TMDB_BASE}/${endpoint}/${c.id}?api_key=${encodeURIComponent(state.apiKey)}&append_to_response=credits&language=fr-FR`);
         const d = await res.json();
         const director = endpoint === 'movie'
           ? ((d.credits?.crew || []).find(p => p.job === 'Director') || {}).name
           : (d.created_by || []).map(p => p.name).join(', ');
-        const keywords = ((d.keywords?.keywords) || (d.keywords?.results) || []).map(k => k.name.toLowerCase());
-        return { ...c, director: director || null, keywords };
+        return { ...c, director: director || null };
       }catch(e){
-        return { ...c, director: null, keywords: [] };
+        return { ...c, director: null };
       }
     }));
 
     return enriched.map(c => {
       const dirScore = directorAffinity(c.director, profile);
-      const kwScore = keywordAffinity(c.keywords, profile);
-      const finalScore = c.stage1 + RECO_WEIGHTS.director * dirScore + RECO_WEIGHTS.keywords * kwScore;
-      return { ...c, dirScore, kwScore, finalScore };
+      const finalScore = c.stage1 + weights.director * dirScore;
+      return { ...c, dirScore, finalScore };
     });
   }
 
-  /* -------------------------------------------------------------------------
-     7. ÉTAPE 3 — DIVERSIFICATION (MMR)
-     ------------------------------------------------------------------------- */
   function itemSimilarity(a, b){
     const gA = new Set(a.genre_ids || []);
     const gB = new Set(b.genre_ids || []);
@@ -2090,9 +2071,6 @@
     return selected;
   }
 
-  /* -------------------------------------------------------------------------
-     8. "Proche de : X" — meilleure correspondance dans tes favoris
-     ------------------------------------------------------------------------- */
   function findBestMatch(candidate, ratedPositive){
     let best = '', bestScore = 0;
     const candGenres = new Set(candidate.genre_ids || []);
@@ -2104,9 +2082,6 @@
     return best;
   }
 
-  /* -------------------------------------------------------------------------
-     9. ORCHESTRATEUR — remplace l'ancien generateJSRecommendations
-     ------------------------------------------------------------------------- */
   async function generateJSRecommendations(){
     const grid = el('recoGrid');
     if(!grid) return;
@@ -2123,6 +2098,7 @@
     }
 
     grid.innerHTML = '<div class="empty-note">Analyse de tes coups de cœur en cours...</div>';
+    const weights = getDynamicWeights();
 
     try{
       const pool = await gatherCandidatePool();
@@ -2131,26 +2107,20 @@
         return;
       }
 
-      // Corpus TF-IDF = bibliothèque notée + pool de candidats
       const corpusTokens = [
         ...state.library.filter(m => m.userRating > 0).map(m => tokenize(m.overview)),
         ...pool.map(c => tokenize(c.overview)),
       ];
       const idf = buildIdf(corpusTokens);
-
       const profile = await buildUserProfile(state.library, idf);
       const globalMeanVote = pool.reduce((s, c) => s + (c.vote_average || 0), 0) / pool.length;
 
-      // Étape 1 — retrieval sur tout le pool
-      const stage1Scored = pool.map(c => stage1Score(c, profile, idf, globalMeanVote));
+      const stage1Scored = pool.map(c => stage1Score(c, profile, idf, globalMeanVote, weights));
       stage1Scored.sort((a, b) => b.stage1 - a.stage1);
-      const shortlist = stage1Scored.slice(0, RERANK_POOL_SIZE);
+      const shortlist = stage1Scored.slice(0, 40);
 
-      // Étape 2 — re-ranking enrichi sur la shortlist
-      const reRanked = await reRankTopCandidates(shortlist, profile);
-
-      // Étape 3 — diversification MMR
-      const diversified = mmrDiversify(reRanked, FINAL_RECO_COUNT, MMR_LAMBDA);
+      const reRanked = await reRankTopCandidates(shortlist, profile, weights);
+      const diversified = mmrDiversify(reRanked, 20, 0.75);
 
       if(diversified.length === 0 || diversified[0].finalScore <= 0){
         grid.innerHTML = '<div class="empty-note">Pas assez de correspondances trouvées. Essaie d\'ajouter plus de films dans ta collection !</div>';
@@ -2168,7 +2138,6 @@
         bestMatchTitle: findBestMatch(c, ratedPositive),
       }));
 
-      // --- Rendu : identique à ton code existant, aucun changement nécessaire ---
       grid.innerHTML = '';
       topRecos.forEach(item => {
         const card = document.createElement('div');
@@ -2223,226 +2192,22 @@
     }
   }
 
-  /* =========================================================
-     AUTO-TUNING DES POIDS DE RECOMMANDATION
-     ---------------------------------------------------------
-     Tes notes servent de vérité terrain : on évalue en aveugle
-     (leave-one-out) si une combinaison de poids aurait classé
-     tes films aimés au-dessus des films pas aimés, avec pour
-     métrique la précision par paires (50% = hasard, 100% =
-     ordre parfait). On explore l'espace des poids par recuit
-     simulé (simulated annealing) avec redémarrages aléatoires.
-  ========================================================= */
-
-  function applyWeights(w){
-    Object.keys(RECO_WEIGHTS).forEach(k => { if(w[k] != null) RECO_WEIGHTS[k] = w[k]; });
-  }
-
-  function normalizeWeights(w){
-    const sum = Object.values(w).reduce((s, v) => s + Math.max(0, v), 0) || 1;
-    const norm = {};
-    Object.keys(w).forEach(k => norm[k] = Math.max(0.005, w[k]) / sum);
-    return norm;
-  }
-
-  function randomWeightVector(base, magnitude){
-    const w = {};
-    Object.keys(base).forEach(k => { w[k] = base[k] + (Math.random() * 2 - 1) * magnitude; });
-    return normalizeWeights(w);
-  }
-
-  /* -------------------------------------------------------------------------
-     2. Préparation des données (une seule fois, réutilisées à chaque essai)
-     ------------------------------------------------------------------------- */
-  async function prepareBacktestData(){
-    const rated = state.library.filter(m => m.userRating > 0 && m.overview);
-    const idf = buildIdf(rated.map(m => tokenize(m.overview)));
-
-    // Récupère (et met en cache) les mots-clés de tous les films notés
-    await Promise.all(rated.map(m => fetchKeywords(m.tmdbId, m.mediaType)));
-
-    const enriched = rated.map(m => ({
-      title: m.title,
-      userRating: m.userRating,
-      genreIds: m.genreIds || [],
-      director: (m.director && m.director !== 'Inconnu') ? m.director : null,
-      year: parseInt(m.year, 10),
-      quality01: (m.rating || 5) / 10,
-      tfidf: tfIdfVector(tokenize(m.overview), idf),
-      keywords: KEYWORDS_CACHE.get(`${m.mediaType}_${m.tmdbId}`) || [],
-      updatedAt: m.updatedAt || m.addedAt || Date.now(),
-    }));
-
-    return enriched;
-  }
-
-  /* -------------------------------------------------------------------------
-     3. Profil "goûts" reconstruit à partir d'un sous-ensemble (leave-one-out)
-     ------------------------------------------------------------------------- */
-  function buildProfileFrom(items){
-    const profile = {
-      textVector: new Map(), genreWeights: new Map(), negativeGenres: new Map(),
-      directorWeights: new Map(), negativeDirectors: new Map(),
-      keywordWeights: new Map(), years: [],
-    };
-
-    items.forEach(it => {
-      const centered = it.userRating - 3; // -2..+2
-      if(centered === 0) return;
-
-      const ageMonths = Math.max(0, (Date.now() - it.updatedAt) / (1000 * 60 * 60 * 24 * 30));
-      const recencyBoost = 1 / (1 + ageMonths / 24);
-      const weight = Math.abs(centered) * (0.6 + 0.4 * recencyBoost);
-
-      if(centered > 0){
-        addWeightedVector(profile.textVector, it.tfidf, weight);
-        it.genreIds.forEach(g => profile.genreWeights.set(g, (profile.genreWeights.get(g) || 0) + weight));
-        if(it.director) profile.directorWeights.set(it.director, (profile.directorWeights.get(it.director) || 0) + weight);
-        it.keywords.forEach(k => profile.keywordWeights.set(k, (profile.keywordWeights.get(k) || 0) + weight));
-        if(it.year) profile.years.push({ y: it.year, w: weight });
-      } else {
-        it.genreIds.forEach(g => profile.negativeGenres.set(g, (profile.negativeGenres.get(g) || 0) + weight));
-        if(it.director) profile.negativeDirectors.set(it.director, (profile.negativeDirectors.get(it.director) || 0) + weight);
-      }
-    });
-
-    let yearMean = null, yearStd = 8;
-    if(profile.years.length){
-      const totW = profile.years.reduce((s, x) => s + x.w, 0);
-      yearMean = profile.years.reduce((s, x) => s + x.y * x.w, 0) / totW;
-      const variance = profile.years.reduce((s, x) => s + x.w * Math.pow(x.y - yearMean, 2), 0) / totW;
-      yearStd = Math.max(5, Math.sqrt(variance));
+  // Écouteurs pour mettre à jour les labels des curseurs en temps réel et relancer les recos
+  ['weightText', 'weightGenre', 'weightEra', 'weightQuality', 'weightDirector'].forEach(id => {
+    const slider = el(id);
+    if(slider){
+      slider.addEventListener('input', () => {
+        const spanId = 'val' + id.replace('weight', '');
+        const span = el(spanId);
+        if(span) span.textContent = slider.value;
+      });
+      slider.addEventListener('change', () => {
+        if(location.hash === '#section-reco') generateJSRecommendations();
+      });
     }
-    profile.yearMean = yearMean;
-    profile.yearStd = yearStd;
-    return profile;
-  }
+  });
 
-  function predictScore(item, profile, w){
-    const textSim = cosineSim(profile.textVector, item.tfidf);
-    const genreSim = genreAffinity(item.genreIds, profile);
-    const era = eraProximity(item.year, profile);
-    const dirScore = directorAffinity(item.director, profile);
-    const kwScore = keywordAffinity(item.keywords, profile);
-    return w.text * textSim + w.genre * genreSim + w.era * era
-         + w.quality * item.quality01 + w.director * dirScore + w.keywords * kwScore;
-  }
-
-  /* -------------------------------------------------------------------------
-     4. Métrique : précision par paires (leave-one-out)
-     ------------------------------------------------------------------------- */
-  function evaluateWeights(enriched, w){
-    const preds = enriched.map((item, idx) => {
-      const rest = enriched.filter((_, i) => i !== idx);
-      const profile = buildProfileFrom(rest);
-      return predictScore(item, profile, w);
-    });
-
-    let correct = 0, total = 0;
-    for(let i = 0; i < enriched.length; i++){
-      for(let j = i + 1; j < enriched.length; j++){
-        const ratingDiff = enriched[i].userRating - enriched[j].userRating;
-        if(ratingDiff === 0) continue;
-        total++;
-        const predSign = Math.sign(preds[i] - preds[j]);
-        const trueSign = Math.sign(ratingDiff);
-        if(predSign === trueSign) correct += 1;
-        else if(predSign === 0) correct += 0.5;
-      }
-    }
-    return total > 0 ? correct / total : 0;
-  }
-
-  /* -------------------------------------------------------------------------
-     5. Recherche : recuit simulé avec redémarrages aléatoires
-     ------------------------------------------------------------------------- */
-  async function optimizeRecoWeights(options = {}){
-    const { iterations = 200, restarts = 3, onProgress = null } = options;
-
-    const enriched = await prepareBacktestData();
-    if(enriched.length < 12){
-      return { success: false, reason: 'not-enough-data', minRequired: 12, current: enriched.length };
-    }
-
-    // Echantillonne si la bibliothèque notée est très grande (perf)
-    const sample = enriched.length > 150
-      ? [...enriched].sort(() => Math.random() - 0.5).slice(0, 150)
-      : enriched;
-
-    let bestWeights = normalizeWeights({ ...RECO_WEIGHTS });
-    let bestScore = evaluateWeights(sample, bestWeights);
-    const baselineScore = bestScore;
-
-    for(let r = 0; r < restarts; r++){
-      let current = r === 0 ? bestWeights : randomWeightVector(bestWeights, 0.35);
-      let currentScore = evaluateWeights(sample, current);
-      let temperature = 0.15;
-
-      for(let it = 0; it < iterations; it++){
-        const candidate = randomWeightVector(current, temperature);
-        const candidateScore = evaluateWeights(sample, candidate);
-
-        const accept = candidateScore > currentScore
-          || Math.random() < Math.exp((candidateScore - currentScore) / Math.max(0.01, temperature));
-
-        if(accept){
-          current = candidate;
-          currentScore = candidateScore;
-          if(currentScore > bestScore){
-            bestScore = currentScore;
-            bestWeights = candidate;
-          }
-        }
-        temperature *= 0.98; // refroidissement progressif
-
-        if(onProgress && it % 20 === 0){
-          onProgress({ restart: r, totalRestarts: restarts, iteration: it, totalIterations: iterations, bestScore, baselineScore });
-          await new Promise(res => setTimeout(res, 0)); // laisse respirer l'UI
-        }
-      }
-    }
-
-    return {
-      success: true,
-      weights: bestWeights,
-      accuracy: bestScore,
-      baselineAccuracy: baselineScore,
-      improvement: bestScore - baselineScore,
-      sampleSize: sample.length,
-    };
-  }
-
-  /** Point d'entrée UI, branché sur #btnRecoAutoTune (cf. plus bas). */
-  async function runRecoAutoTune(){
-    const statusEl = document.getElementById('recoTuneStatus');
-    const setStatus = (txt) => { if(statusEl) statusEl.textContent = txt; };
-
-    setStatus('Analyse de tes notes en cours…');
-
-    const result = await optimizeRecoWeights({
-      iterations: 200,
-      restarts: 3,
-      onProgress: ({ restart, totalRestarts, bestScore }) => {
-        setStatus(`Optimisation… (passe ${restart + 1}/${totalRestarts}, précision actuelle : ${(bestScore * 100).toFixed(1)}%)`);
-      },
-    });
-
-    if(!result.success){
-      setStatus(`Pas assez de films notés pour optimiser (minimum ${result.minRequired}, tu en as ${result.current}). Note plus de films — y compris ceux que tu n'as pas aimés, c'est un signal important aussi !`);
-      return;
-    }
-
-    applyWeights(result.weights);
-    state.recoWeights = { ...RECO_WEIGHTS };
-    await persist();
-
-    const pct = (v) => (v * 100).toFixed(1) + '%';
-    setStatus(`✓ Poids optimisés sur ${result.sampleSize} films notés : précision ${pct(result.baselineAccuracy)} → ${pct(result.accuracy)}.`);
-
-    generateJSRecommendations();
-  }
-
-  el('btnRecoAutoTune').addEventListener('click', runRecoAutoTune);
+  el('btnRecoRefresh').addEventListener('click', generateJSRecommendations);
 
   /* =========================================================
      GESTION DES BUGS & AMÉLIORATIONS (DANS LES RÉGLAGES)
@@ -2652,7 +2417,6 @@
     const m = findInLibrary(id);
     if(!m) return;
     selectedMovie = normalizeMedia({ ...m });
-    // Force la recharge des similar pour s'assurer qu'ils sont bien présents même si le film vient de la lib
     fetchMediaData(m.tmdbId, m.mediaType, m.status).then(fresh => {
       selectedMovie.similar = fresh.similar;
       renderHero();
@@ -2728,7 +2492,6 @@
         if(parsed.disliked) state.disliked = parsed.disliked;
         if(parsed.calendarCache) state.calendarCache = parsed.calendarCache;
         if(parsed.bugs) state.bugs = parsed.bugs;
-        if(parsed.recoWeights) applyWeights(parsed.recoWeights);
         ['movie', 'tv', 'anime'].forEach(cat => { if(!Array.isArray(state.top10[cat])) state.top10[cat] = []; });
 
         libVisibleCount = LIB_PAGE_SIZE;
