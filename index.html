@@ -2770,6 +2770,7 @@
       const query = parts[0];
       let status = 'À voir';
       let progress = null;
+      let userRating = 0;
 
       for(let p = 1; p < parts.length; p++){
         const val = parts[p].toLowerCase();
@@ -2778,6 +2779,12 @@
         
         const parsedSE = parseSeasonEpisode(parts[p]);
         if(parsedSE) progress = parsedSE;
+
+        const ratingMatch = parts[p].match(/^(\d+([\.,]\d+)?)\s*\/\s*10$/i);
+        if(ratingMatch){
+          const rawScore = parseFloat(ratingMatch[1].replace(',', '.'));
+          userRating = Math.max(1, Math.min(5, Math.round(rawScore / 2)));
+        }
       }
 
       statusBox.textContent = `Import (${i + 1}/${lines.length}) : ${query}...`;
@@ -2794,6 +2801,9 @@
             if(progress){
               fullData.season = progress.season;
               fullData.episode = progress.episode;
+            }
+            if(userRating > 0){
+              fullData.userRating = userRating;
             }
             fullData.updatedAt = Date.now();
             state.library.push(fullData);
