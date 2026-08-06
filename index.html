@@ -2771,7 +2771,7 @@
       let status = 'À voir';
       let progress = null;
       let userRating = 0;
-      let targetYear = null; // Variable pour stocker l'année recherchée
+      let targetYear = null;
 
       for(let p = 1; p < parts.length; p++){
         const val = parts[p].toLowerCase();
@@ -2787,31 +2787,36 @@
           userRating = Math.max(1, Math.min(5, Math.round(rawScore / 2)));
         }
 
-        // Détection de l'année (ex: 2010, 2023, etc.)
         const yearMatch = parts[p].match(/^(19|20)\d{2}$/);
         if(yearMatch){
           targetYear = parts[p];
         }
       }
 
-      statusBox.textContent = `Import (${i + 1}/${lines.length}) : ${query}...`;
+      statusBox.textContent = `Import (${i + 1}/${lines.length}) : ${query} (${targetYear || 'sans année'})...`;
 
       try{
-        let searchUrl = `${TMDB_BASE}/search/multi?api_key=${encodeURIComponent(state.apiKey)}&query=${encodeURIComponent(query)}`;
-        const res = await fetch(searchUrl);
-        const data = await res.json();
-        
-        let results = (data.results || []).filter(item => (item.media_type === 'movie' || item.media_type === 'tv') && !isDisliked(item.id));
-        
-        // Si une année est précisée, on filtre en priorité pour trouver le bon film/série
-        if(targetYear && results.length > 0){
-          const exactYearMatch = results.find(item => {
-            const itemDate = item.release_date || item.first_air_date || '';
-            return itemDate.startsWith(targetYear);
-          });
-          if(exactYearMatch){
-            results = [exactYearMatch, ...results.filter(r => r.id !== exactYearMatch.id)];
-          }
+        let results = [];
+
+        if(targetYear){
+          // Recherche ciblée avec l'année pour les films et les séries séparément
+          const movieRes = await fetch(`${TMDB_BASE}/search/movie?api_key=${encodeURIComponent(state.apiKey)}&query=${encodeURIComponent(query)}&year=${targetYear}&language=fr-FR`);
+          const movieData = await movieRes.json();
+          const movies = (movieData.results || []).map(m => ({ ...m, media_type: 'movie' }));
+
+          const tvRes = await fetch(`${TMDB_BASE}/search/tv?api_key=${encodeURIComponent(state.apiKey)}&query=${encodeURIComponent(query)}&first_air_date_year=${targetYear}&language=fr-FR`);
+          const tvData = await tvRes.json();
+          const tvs = (tvData.results || []).map(t => ({ ...t, media_type: 'tv' }));
+
+          results = [...movies, ...tvs].filter(item => !isDisliked(item.id));
+        }
+
+        // Si rien n'a été trouvé avec l'année (ou s'il n'y a pas d'année), on fait une recherche multi classique de secours
+        if(results.length === 0){
+          const searchUrl = `${TMDB_BASE}/search/multi?api_key=${encodeURIComponent(state.apiKey)}&query=${encodeURIComponent(query)}&language=fr-FR`;
+          const res = await fetch(searchUrl);
+          const data = await res.json();
+          results = (data.results || []).filter(item => (item.media_type === 'movie' || item.media_type === 'tv') && !isDisliked(item.id));
         }
 
         if(results.length > 0){
