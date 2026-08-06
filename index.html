@@ -685,6 +685,17 @@
       <input type="file" id="fileInput" accept=".txt,.csv" style="display:none;">
       <button class="btn-ghost" id="btnChooseFile" style="width:100%; justify-content:center;">📁 Sélectionner un fichier .txt</button>
       <div id="importStatus" style="font-size:12.5px; margin-top:8px; color:var(--color-accent-gold);"></div>
+      <div id="importLogBox" style="display:none; margin-top:10px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <p style="font-size:12px; color:var(--color-text-muted); margin:0;"><span id="importLogSummary"></span></p>
+          <div style="display:flex; gap:6px;">
+            <button class="btn-ghost" id="btnCopyLog" style="font-size:11px; padding:4px 8px;">📋 Copier</button>
+            <button class="btn-ghost" id="btnDownloadLog" style="font-size:11px; padding:4px 8px;">⬇️ .txt</button>
+          </div>
+        </div>
+        <div id="importLogList" style="max-height:260px; overflow-y:auto; border:1px solid var(--color-border-subtle); border-radius:6px; font-size:11.5px; font-family:monospace;"></div>
+        <button class="btn-ghost" id="btnRetryFailed" style="width:100%; justify-content:center; margin-top:8px; font-size:12.5px; padding:8px;">🔁 Réessayer les échecs</button>
+      </div>
     </div>
 
     <div class="modal-actions">
@@ -2751,22 +2762,52 @@
 
   el('btnChooseFile').addEventListener('click', () => el('fileInput').click());
 
-  el('fileInput').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if(!file) return;
-    if(!state.apiKey){
-      alert("Enregistre d'abord une clé API TMDB valide.");
-      return;
-    }
+  // ---- Journal d'import : un tableau d'entrées {time, query, action, matchedTitle, reason, rawLine} ----
+  let importLog = [];
 
-    const text = await file.text();
-    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-    const statusBox = el('importStatus');
+  function logStyle(action){
+    switch(action){
+      case 'ajouté': return 'color:#7ec97e;';
+      case 'déjà présent': return 'color:var(--color-text-muted);';
+      case 'ignoré (non aimé)': return 'color:var(--color-text-muted);';
+      case 'échec': return 'color:#e07a7a;';
+      default: return '';
+    }
+  }
+
+  function renderImportLog(){
+    const box = el('importLogBox');
+    const list = el('importLogList');
+    if(importLog.length === 0){ box.style.display = 'none'; list.innerHTML = ''; return; }
+    box.style.display = 'block';
+
+    const counts = importLog.reduce((acc, e) => { acc[e.action] = (acc[e.action]||0)+1; return acc; }, {});
+    el('importLogSummary').textContent =
+      `${counts['ajouté']||0} ajouté(s) · ${counts['déjà présent']||0} déjà présent(s) · ${counts['ignoré (non aimé)']||0} ignoré(s) · ${counts['échec']||0} échec(s)`;
+
+    list.innerHTML = importLog.map(e => {
+      const matched = e.matchedTitle ? ` → <b>${e.matchedTitle}</b>` : '';
+      return `<div style="padding:5px 8px; border-bottom:1px solid var(--color-border-subtle); ${logStyle(e.action)}">
+        <span style="opacity:0.6;">[${e.time}]</span> <b>${e.action.toUpperCase()}</b> — ${e.query}${matched}
+        ${e.reason ? `<div style="opacity:0.75; font-size:10.5px;">${e.reason}</div>` : ''}
+      </div>`;
+    }).join('');
+    list.scrollTop = list.scrollHeight;
+  }
+
+  function addLogEntry(entry){
+    importLog.push({ time: new Date().toLocaleTimeString('fr-FR'), ...entry });
+    renderImportLog();
+  }
+
+  // Importe une liste de lignes brutes ("Titre | Statut | Année | Note"), sans délai artificiel entre les requêtes.
+  // Chaque ligne génère une entrée dans importLog expliquant ce qui s'est passé et pourquoi.
+  async function runBulkImport(lines, statusBox){
     let imported = 0;
-    statusBox.textContent = `Traitement de ${lines.length} lignes...`;
 
     for(let i = 0; i < lines.length; i++){
-      const parts = lines[i].split('|').map(p => p.trim());
+      const rawLine = lines[i];
+      const parts = rawLine.split('|').map(p => p.trim());
       const query = parts[0];
       let status = 'À voir';
       let progress = null;
@@ -2777,7 +2818,7 @@
         const val = parts[p].toLowerCase();
         if(val === 'vu') status = 'Vu';
         else if(val === 'en cours') status = 'En cours';
-        
+
         const parsedSE = parseSeasonEpisode(parts[p]);
         if(parsedSE) progress = parsedSE;
 
@@ -2793,58 +2834,146 @@
         }
       }
 
-      statusBox.textContent = `Import (${i + 1}/${lines.length}) : ${query} (${targetYear || 'sans année'})...`;
+      statusBox.textContent = `Import (${i + 1}/${lines.length}) : ${query}...`;
 
       try{
         let results = [];
 
-        if(targetYear){
-          // Recherche ciblée avec l'année pour les films et les séries séparément
+        // MÉTHODE 1 : Recherche rapide multi classique en premier
+        const searchUrl = `${TMDB_BASE}/search/multi?api_key=${encodeURIComponent(state.apiKey)}&query=${encodeURIComponent(query)}&language=fr-FR`;
+        const res = await fetch(searchUrl);
+        if(res.status === 429){
+          addLogEntry({ query, rawLine, action: 'échec', matchedTitle: null, reason: `HTTP 429 — limite de débit TMDB dépassée (recherche multi)` });
+          continue;
+        }
+        const data = await res.json();
+        results = (data.results || []).filter(item => (item.media_type === 'movie' || item.media_type === 'tv') && !isDisliked(item.id));
+
+        const firstResultDate = results[0] ? (results[0].release_date || results[0].first_air_date || '') : '';
+        const yearMatchesFirst = targetYear ? firstResultDate.startsWith(targetYear) : true;
+
+        // MÉTHODE 2 : recherche ciblée par type si la méthode 1 ne donne pas la bonne année
+        if(targetYear && (!results.length || !yearMatchesFirst)){
           const movieRes = await fetch(`${TMDB_BASE}/search/movie?api_key=${encodeURIComponent(state.apiKey)}&query=${encodeURIComponent(query)}&year=${targetYear}&language=fr-FR`);
+          if(movieRes.status === 429){
+            addLogEntry({ query, rawLine, action: 'échec', matchedTitle: null, reason: `HTTP 429 — limite de débit TMDB dépassée (recherche film ${targetYear})` });
+            continue;
+          }
           const movieData = await movieRes.json();
           const movies = (movieData.results || []).map(m => ({ ...m, media_type: 'movie' }));
 
           const tvRes = await fetch(`${TMDB_BASE}/search/tv?api_key=${encodeURIComponent(state.apiKey)}&query=${encodeURIComponent(query)}&first_air_date_year=${targetYear}&language=fr-FR`);
+          if(tvRes.status === 429){
+            addLogEntry({ query, rawLine, action: 'échec', matchedTitle: null, reason: `HTTP 429 — limite de débit TMDB dépassée (recherche série ${targetYear})` });
+            continue;
+          }
           const tvData = await tvRes.json();
           const tvs = (tvData.results || []).map(t => ({ ...t, media_type: 'tv' }));
 
           results = [...movies, ...tvs].filter(item => !isDisliked(item.id));
         }
 
-        // Si rien n'a été trouvé avec l'année (ou s'il n'y a pas d'année), on fait une recherche multi classique de secours
         if(results.length === 0){
-          const searchUrl = `${TMDB_BASE}/search/multi?api_key=${encodeURIComponent(state.apiKey)}&query=${encodeURIComponent(query)}&language=fr-FR`;
-          const res = await fetch(searchUrl);
-          const data = await res.json();
-          results = (data.results || []).filter(item => (item.media_type === 'movie' || item.media_type === 'tv') && !isDisliked(item.id));
+          addLogEntry({ query, rawLine, action: 'échec', matchedTitle: null, reason: targetYear ? `Aucun résultat TMDB pour l'année ${targetYear}` : `Aucun résultat TMDB` });
+          continue;
         }
 
-        if(results.length > 0){
-          const firstHit = results[0];
-          if(!findInLibrary(firstHit.id) && !isDisliked(firstHit.id)){
-            const fullData = await fetchMediaData(firstHit.id, firstHit.media_type, status);
-            if(progress){
-              fullData.season = progress.season;
-              fullData.episode = progress.episode;
-            }
-            if(userRating > 0){
-              fullData.userRating = userRating;
-            }
-            fullData.updatedAt = Date.now();
-            state.library.push(fullData);
-            imported++;
-          }
+        const firstHit = results[0];
+        const foundTitle = firstHit.title || firstHit.name || query;
+
+        if(isDisliked(firstHit.id)){
+          addLogEntry({ query, rawLine, action: 'ignoré (non aimé)', matchedTitle: foundTitle, reason: `tmdbId ${firstHit.id} présent dans la liste "non aimé"` });
+          continue;
         }
-      }catch(err){ console.error("Erreur import :", query, err); }
+        if(findInLibrary(firstHit.id)){
+          addLogEntry({ query, rawLine, action: 'déjà présent', matchedTitle: foundTitle, reason: `tmdbId ${firstHit.id} déjà dans la bibliothèque` });
+          continue;
+        }
+
+        const fullData = await fetchMediaData(firstHit.id, firstHit.media_type, status);
+        if(progress){
+          fullData.season = progress.season;
+          fullData.episode = progress.episode;
+        }
+        if(userRating > 0){
+          fullData.userRating = userRating;
+        }
+        fullData.updatedAt = Date.now();
+        state.library.push(fullData);
+        imported++;
+        addLogEntry({ query, rawLine, action: 'ajouté', matchedTitle: foundTitle, reason: `tmdbId ${firstHit.id} (${firstHit.media_type === 'tv' ? 'série' : 'film'})` });
+
+      }catch(err){
+        console.error("Erreur import :", query, err);
+        addLogEntry({ query, rawLine, action: 'échec', matchedTitle: null, reason: `Erreur : ${err.message || err}` });
+      }
     }
+
+    return imported;
+  }
+
+  el('fileInput').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if(!file) return;
+    if(!state.apiKey){
+      alert("Enregistre d'abord une clé API TMDB valide.");
+      return;
+    }
+
+    const text = await file.text();
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+    const statusBox = el('importStatus');
+    statusBox.textContent = `Traitement de ${lines.length} lignes...`;
+    importLog = [];
+    renderImportLog();
+
+    const imported = await runBulkImport(lines, statusBox);
 
     libVisibleCount = LIB_PAGE_SIZE;
     await persist();
     renderLibrary();
     renderResults();
     loadCalendarData();
-    statusBox.textContent = `✓ ${imported} élément(s) ajouté(s) avec succès !`;
+    statusBox.textContent = `✓ Terminé — ${imported} élément(s) ajouté(s). Détail dans le journal ci-dessous.`;
     el('fileInput').value = "";
+  });
+
+  el('btnRetryFailed').addEventListener('click', async () => {
+    const lines = importLog.filter(e => e.action === 'échec').map(e => e.rawLine);
+    if(lines.length === 0) return;
+    if(!state.apiKey){
+      alert("Enregistre d'abord une clé API TMDB valide.");
+      return;
+    }
+    const statusBox = el('importStatus');
+    statusBox.textContent = `Nouvelle tentative sur ${lines.length} échec(s)...`;
+    // on retire du journal les anciens échecs qu'on retente, pour ne pas les compter deux fois
+    importLog = importLog.filter(e => e.action !== 'échec');
+    renderImportLog();
+
+    const imported = await runBulkImport(lines, statusBox);
+
+    libVisibleCount = LIB_PAGE_SIZE;
+    await persist();
+    renderLibrary();
+    renderResults();
+    loadCalendarData();
+    statusBox.textContent = `✓ Nouvelle tentative terminée — ${imported} élément(s) ajouté(s) en plus.`;
+  });
+
+  el('btnCopyLog').addEventListener('click', () => {
+    const text = importLog.map(e => `[${e.time}] ${e.action.toUpperCase()} — ${e.query}${e.matchedTitle ? ' → ' + e.matchedTitle : ''}${e.reason ? ' (' + e.reason + ')' : ''}`).join('\n');
+    navigator.clipboard.writeText(text);
+  });
+
+  el('btnDownloadLog').addEventListener('click', () => {
+    const text = importLog.map(e => `[${e.time}] ${e.action.toUpperCase()} — ${e.query}${e.matchedTitle ? ' → ' + e.matchedTitle : ''}${e.reason ? ' (' + e.reason + ')' : ''}`).join('\n');
+    const anchor = document.createElement('a');
+    anchor.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    anchor.setAttribute('download', `import_log_${new Date().toISOString().slice(0,10)}.txt`);
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
   });
 
   /* =========================================================
