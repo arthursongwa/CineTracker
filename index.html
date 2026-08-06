@@ -2771,6 +2771,7 @@
       let status = 'À voir';
       let progress = null;
       let userRating = 0;
+      let targetYear = null; // Variable pour stocker l'année recherchée
 
       for(let p = 1; p < parts.length; p++){
         const val = parts[p].toLowerCase();
@@ -2785,15 +2786,34 @@
           const rawScore = parseFloat(ratingMatch[1].replace(',', '.'));
           userRating = Math.max(1, Math.min(5, Math.round(rawScore / 2)));
         }
+
+        // Détection de l'année (ex: 2010, 2023, etc.)
+        const yearMatch = parts[p].match(/^(19|20)\d{2}$/);
+        if(yearMatch){
+          targetYear = parts[p];
+        }
       }
 
       statusBox.textContent = `Import (${i + 1}/${lines.length}) : ${query}...`;
 
       try{
-        const searchUrl = `${TMDB_BASE}/search/multi?api_key=${encodeURIComponent(state.apiKey)}&query=${encodeURIComponent(query)}`;
+        let searchUrl = `${TMDB_BASE}/search/multi?api_key=${encodeURIComponent(state.apiKey)}&query=${encodeURIComponent(query)}`;
         const res = await fetch(searchUrl);
         const data = await res.json();
-        const results = (data.results || []).filter(item => (item.media_type === 'movie' || item.media_type === 'tv') && !isDisliked(item.id));
+        
+        let results = (data.results || []).filter(item => (item.media_type === 'movie' || item.media_type === 'tv') && !isDisliked(item.id));
+        
+        // Si une année est précisée, on filtre en priorité pour trouver le bon film/série
+        if(targetYear && results.length > 0){
+          const exactYearMatch = results.find(item => {
+            const itemDate = item.release_date || item.first_air_date || '';
+            return itemDate.startsWith(targetYear);
+          });
+          if(exactYearMatch){
+            results = [exactYearMatch, ...results.filter(r => r.id !== exactYearMatch.id)];
+          }
+        }
+
         if(results.length > 0){
           const firstHit = results[0];
           if(!findInLibrary(firstHit.id) && !isDisliked(firstHit.id)){
