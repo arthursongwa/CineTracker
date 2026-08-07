@@ -372,20 +372,63 @@
   .similar-card .sc-status.vu{background:rgba(127,168,120,0.18); color:var(--color-success);}
   .similar-card .sc-stars{color:var(--color-accent-gold); font-size:11px; margin-top:3px;}
 
-  /* ============ TOP 10 ============ */
-  .top10-tabs{display:flex; gap:var(--spacing-xs); background:var(--color-background-card); padding:3px; border-radius:var(--radius-tab-button); border:1px solid var(--color-border-subtle);}
-  .top10-list{display:flex; flex-direction:column; gap:var(--spacing-sm);}
+  /* ============ TOP 10 (style cinepulse) ============ */
+  .top10-hero{position:relative; text-align:center; padding:var(--spacing-4xl) var(--spacing-lg) var(--spacing-lg); border-radius:var(--radius-outer-card); overflow:hidden; background:var(--color-background-card); border:1px solid var(--color-border-subtle); margin-bottom:var(--spacing-2xl);}
+  .top10-hero::before{content:""; position:absolute; inset:0; pointer-events:none; background:radial-gradient(420px 220px at 50% 0%, rgba(255,59,82,0.16), transparent 70%);}
+  .top10-hero-title{position:relative; font-family:var(--font-playfair); font-weight:800; font-size:clamp(46px,9vw,90px); line-height:1; letter-spacing:-1px; margin:0 0 6px; background:linear-gradient(90deg, var(--color-accent-gold), #ff8a4c, var(--color-accent-gold)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;}
+  .top10-hero-sub{position:relative; font-family:var(--font-bricolage); font-weight:700; font-size:clamp(17px,2.6vw,26px); color:rgba(255,255,255,0.92); margin-bottom:4px;}
+  .top10-hero-period{position:relative; color:var(--color-text-secondary); font-size:13.5px; margin-bottom:var(--spacing-xl);}
+
+  .top10-tabs{position:relative; display:inline-flex; gap:4px; background:rgba(0,0,0,0.35); backdrop-filter:blur(10px); border:1px solid var(--color-border-subtle); border-radius:16px; padding:5px; margin-bottom:var(--spacing-2xl);}
+  .top10-tabs .tab-btn{padding:10px 22px; border-radius:11px; font-size:13px;}
+  .top10-tabs .tab-btn.active{background:var(--color-accent-gold); color:#fff;}
+
+  .top10-kpis{position:relative; display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); border-top:1px solid var(--color-border-subtle);}
+  .top10-kpi{padding:var(--spacing-xl) var(--spacing-sm); text-align:center; border-right:1px solid var(--color-border-subtle);}
+  .top10-kpi:last-child{border-right:none;}
+  .top10-kpi-label{font-family:var(--font-bricolage); font-size:11px; font-weight:600; letter-spacing:0.6px; text-transform:uppercase; color:var(--color-text-secondary);}
+  .top10-kpi-value{font-family:var(--font-playfair); font-weight:800; font-size:30px; color:var(--color-text-primary); margin-top:8px; line-height:1.1;}
+
+  .top10-list{display:flex; flex-direction:column; gap:var(--spacing-md);}
   .top10-row{
-    display:flex; align-items:center; gap:var(--spacing-md); background:var(--color-background-card);
-    border:1px solid var(--color-border-subtle); border-radius:var(--radius-card); padding:var(--spacing-sm) var(--spacing-md);
+    position:relative; overflow:hidden; border-radius:var(--radius-card); background:var(--color-background-card);
+    border:1px solid var(--color-border-subtle);
+    padding:var(--spacing-lg) var(--spacing-xl); display:flex; align-items:center; gap:var(--spacing-xl); flex-wrap:wrap;
+    transition:border-color .15s ease;
   }
-  .top10-rank{font-family:var(--font-playfair); font-weight:700; font-size:20px; color:var(--color-accent-gold); width:30px; text-align:center; flex-shrink:0;}
-  .top10-row img{width:44px; height:64px; object-fit:cover; border-radius:8px; background:var(--color-surface-dark); flex-shrink:0; cursor:pointer;}
-  .top10-info{flex:1; min-width:0;}
-  .top10-info .t10-title{font-size:13.5px; font-weight:600; cursor:pointer; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .top10-info .t10-sub{font-size:11.5px; color:var(--color-text-secondary);}
-  .top10-actions{display:flex; gap:4px; flex-shrink:0;}
-  .top10-row.empty{border-style:dashed; color:var(--color-text-secondary); font-size:13px; justify-content:center; padding:var(--spacing-md);}
+  .top10-row:hover{border-color:rgba(255,59,82,0.35);}
+  .top10-row-backdrop{position:absolute; inset:0; background-size:cover; background-position:center; opacity:0.12; z-index:0; filter:saturate(1.2);}
+  .top10-rank{position:relative; z-index:1; font-family:var(--font-playfair); font-weight:800; font-size:clamp(30px,4vw,46px); color:var(--color-text-primary); line-height:1; flex-shrink:0; min-width:46px; text-align:center;}
+  .top10-poster{position:relative; z-index:1; width:52px; height:76px; object-fit:cover; border-radius:8px; background:var(--color-surface-dark); flex-shrink:0; cursor:pointer;}
+  .top10-info{position:relative; z-index:1; flex:1; min-width:160px;}
+  .t10-title{font-size:16.5px; font-weight:700; margin-bottom:8px; cursor:pointer; transition:color .15s ease;}
+  .t10-title:hover{color:var(--color-accent-gold);}
+  .t10-genres{display:flex; flex-wrap:wrap; gap:6px;}
+  .t10-genre-pill{background:#fff; color:#151316; font-size:10px; font-weight:700; padding:3px 8px; border-radius:6px; white-space:nowrap;}
+  .t10-sub{font-size:11.5px; color:var(--color-text-secondary); margin-top:6px;}
+  .top10-stats{position:relative; z-index:1; display:flex; gap:8px; flex-shrink:0;}
+  .top10-stat-box{background:rgba(0,0,0,0.3); border:1px solid var(--color-border-subtle); border-radius:10px; padding:7px 14px; text-align:center; min-width:64px;}
+  .top10-stat-box .tsb-val{font-family:var(--font-playfair); font-size:17px; font-weight:700; color:var(--color-text-primary); line-height:1.2;}
+  .top10-stat-box .tsb-lbl{font-size:9.5px; color:var(--color-text-secondary); text-transform:uppercase; letter-spacing:0.4px;}
+  .top10-actions{position:relative; z-index:1; display:flex; gap:4px; flex-shrink:0;}
+  .top10-row.empty{border-style:dashed; justify-content:center; padding:var(--spacing-md) var(--spacing-xl); background:transparent;}
+  .top10-row.empty .top10-rank{color:var(--color-text-muted);}
+  .top10-row.empty .empty-label{position:relative; z-index:1; color:var(--color-text-secondary); font-size:13px;}
+
+  /* Bloc explicatif façon cinepulse */
+  .top10-explainer{margin-top:var(--spacing-5xl);}
+  .top10-explainer h3{font-family:var(--font-playfair); font-size:19px; font-weight:700; color:var(--color-text-primary); margin:0 0 var(--spacing-md);}
+  .top10-explainer h4{font-size:14.5px; font-weight:700; color:var(--color-text-primary); margin:var(--spacing-xl) 0 8px; display:flex; align-items:center; gap:8px;}
+  .top10-explainer p{font-size:13.5px; line-height:1.65; color:var(--color-text-secondary); margin:0;}
+  .top10-explainer ul{list-style:none; margin:10px 0 0; padding:0; display:flex; flex-direction:column; gap:8px;}
+  .top10-explainer li{display:flex; align-items:flex-start; gap:8px; font-size:13.5px; line-height:1.6; color:var(--color-text-secondary);}
+  .top10-explainer li::before{content:"•"; color:var(--color-text-muted); flex-shrink:0;}
+  .top10-explainer b{color:var(--color-text-primary); font-weight:700;}
+
+  @media (max-width:640px){
+    .top10-row{padding:var(--spacing-md) var(--spacing-lg); gap:var(--spacing-md);}
+    .top10-stats{width:100%; justify-content:flex-start;}
+  }
 
   /* ============ RECOMMENDATIONS (JS) ============ */
   .reco-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:var(--spacing-lg);}
@@ -755,19 +798,40 @@
 
   <!-- ============ TOP 10 ============ -->
   <section class="section page" id="section-top10">
-    <div class="section-header">
-      <div>
-        <div class="section-eyebrow">Classement personnel</div>
-        <h2 class="section-title">Mon Top 10</h2>
-        <div class="section-sub">Utilise 🏆 sur une fiche ou une carte de ta collection pour classer un titre. Réordonne avec les flèches.</div>
-      </div>
+    <div class="top10-hero">
+      <div class="top10-hero-title">TOP 10</div>
+      <div class="top10-hero-sub" id="top10CatLabel">MES FILMS PRÉFÉRÉS</div>
+      <div class="top10-hero-period">Ton classement personnel — à toi de le construire</div>
       <div class="top10-tabs" id="top10Tabs">
         <button class="tab-btn active" data-cat="movie">Films</button>
         <button class="tab-btn" data-cat="tv">Séries</button>
         <button class="tab-btn" data-cat="anime">Animes</button>
       </div>
+      <div class="top10-kpis" id="top10Kpis"></div>
     </div>
+
+    <div class="section-sub" style="margin-bottom:var(--spacing-lg);">Utilise 🏆 sur une fiche ou une carte de ta collection pour classer un titre. Réordonne avec les flèches.</div>
+
     <div class="top10-list" id="top10List"></div>
+
+    <div class="top10-explainer">
+      <h3>Comment fonctionne ton Top 10 ?</h3>
+      <p>Ton <b>Top 10 CinéTracker</b>, ce n'est pas un algorithme caché : c'est <b>toi</b> qui classes tes 10 films, séries et animes préférés dans chaque catégorie, dans l'ordre que tu veux.</p>
+
+      <h4>🏆 Comment ajouter un titre ?</h4>
+      <p>Depuis n'importe quelle fiche ou carte de ta collection, clique sur le bouton <b>🏆</b>. Le titre rejoint ton classement de sa catégorie (Film, Série ou Anime), tant qu'il reste une place libre parmi les 10.</p>
+
+      <h4>📊 D'où viennent les stats affichées ?</h4>
+      <ul>
+        <li><b>Titres classés</b> : le nombre de places déjà occupées sur les 10 disponibles.</li>
+        <li><b>Note moyenne</b> : la moyenne de tes propres notes (⭐) sur les titres classés.</li>
+        <li><b>Genre dominant</b> : le genre qui revient le plus souvent parmi ton classement.</li>
+        <li><b>Complété</b> : la progression de ton Top 10 vers les 10 places.</li>
+      </ul>
+
+      <h4>🔀 Pourquoi réordonner ?</h4>
+      <p>Utilise les flèches ▲▼ pour ajuster le classement au fil de tes découvertes, et ✕ pour libérer une place. Ton Top 10 évolue avec tes goûts — rien n'est figé.</p>
+    </div>
   </section>
 
   <!-- ============ RECOMMENDATIONS (JS) ============ -->
@@ -2118,6 +2182,12 @@
     });
   });
 
+  function top10CatLabelText(cat){
+    if(cat === 'movie') return 'MES FILMS PRÉFÉRÉS';
+    if(cat === 'tv') return 'MES SÉRIES PRÉFÉRÉES';
+    return 'MES ANIMES PRÉFÉRÉS';
+  }
+
   async function toggleTop10(tmdbId){
     const item = findInLibrary(tmdbId);
     if(!item) return;
@@ -2159,19 +2229,62 @@
     renderLibrary();
   }
 
+  function renderTop10Kpis(items){
+    const filled = items.filter(Boolean);
+    const ratings = filled.map(i => i.userRating).filter(r => r > 0);
+    const avgRating = ratings.length ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1) : '—';
+
+    const genreCounts = {};
+    filled.forEach(i => (i.genres || []).forEach(g => {
+      const name = typeof g === 'string' ? g : (g && g.name);
+      if(name) genreCounts[name] = (genreCounts[name] || 0) + 1;
+    }));
+    const topGenreEntry = Object.entries(genreCounts).sort((a, b) => b[1] - a[1])[0];
+    const dominantGenre = topGenreEntry ? topGenreEntry[0] : '—';
+
+    const pct = Math.round((filled.length / TOP10_MAX) * 100);
+
+    el('top10Kpis').innerHTML = `
+      <div class="top10-kpi">
+        <div class="top10-kpi-label">Titres classés</div>
+        <div class="top10-kpi-value">${filled.length}/${TOP10_MAX}</div>
+      </div>
+      <div class="top10-kpi">
+        <div class="top10-kpi-label">Note moyenne</div>
+        <div class="top10-kpi-value">${avgRating}${avgRating !== '—' ? ' ★' : ''}</div>
+      </div>
+      <div class="top10-kpi">
+        <div class="top10-kpi-label">Genre dominant</div>
+        <div class="top10-kpi-value" style="font-size:19px;">${escapeHtml(dominantGenre)}</div>
+      </div>
+      <div class="top10-kpi">
+        <div class="top10-kpi-label">Complété</div>
+        <div class="top10-kpi-value">${pct}%</div>
+      </div>
+    `;
+  }
+
   function renderTop10(){
     const container = el('top10List');
     const list = state.top10[currentTop10Cat] || [];
     container.innerHTML = '';
 
+    el('top10CatLabel').textContent = top10CatLabelText(currentTop10Cat);
+
+    const resolvedItems = [];
     for(let i = 0; i < TOP10_MAX; i++){
       const tmdbId = list[i];
-      const item = tmdbId ? findInLibrary(tmdbId) : null;
+      resolvedItems.push(tmdbId ? findInLibrary(tmdbId) : null);
+    }
+    renderTop10Kpis(resolvedItems);
+
+    for(let i = 0; i < TOP10_MAX; i++){
+      const item = resolvedItems[i];
 
       if(!item){
         const row = document.createElement('div');
         row.className = 'top10-row empty';
-        row.innerHTML = `<span class="top10-rank">${i + 1}</span>&nbsp; Emplacement libre`;
+        row.innerHTML = `<span class="top10-rank">${i + 1}</span><span class="empty-label">Emplacement libre</span>`;
         container.appendChild(row);
         continue;
       }
@@ -2179,13 +2292,22 @@
       const row = document.createElement('div');
       row.className = 'top10-row';
       const poster = item.posterPath ? IMG_W500 + item.posterPath : '';
-      const userStarsText = item.userRating ? ' · ' + '★'.repeat(item.userRating) : '';
+      const backdropImg = item.backdropPath ? BACKDROP_W1280 + item.backdropPath : (item.posterPath ? IMG_W500 + item.posterPath : '');
+      const genrePills = (item.genres || []).slice(0, 3).map(g => `<span class="t10-genre-pill">${escapeHtml(typeof g === 'string' ? g : (g && g.name) || '')}</span>`).join('');
+      const ratingText = item.userRating ? `${item.userRating}/5` : '—';
+
       row.innerHTML = `
+        ${backdropImg ? `<div class="top10-row-backdrop" style="background-image:url('${backdropImg}')"></div>` : ''}
         <span class="top10-rank">${i + 1}</span>
-        <img src="${poster}" alt="${escapeHtml(item.title)}" loading="lazy" data-open="${item.tmdbId}">
+        <img class="top10-poster" src="${poster}" alt="${escapeHtml(item.title)}" loading="lazy" data-open="${item.tmdbId}">
         <div class="top10-info">
           <div class="t10-title" data-open="${item.tmdbId}">${escapeHtml(item.title)}</div>
-          <div class="t10-sub">${item.year || 'N/A'}${userStarsText}</div>
+          <div class="t10-genres">${genrePills}</div>
+          <div class="t10-sub">${item.year || 'N/A'}</div>
+        </div>
+        <div class="top10-stats">
+          <div class="top10-stat-box"><div class="tsb-val">${ratingText}</div><div class="tsb-lbl">Note</div></div>
+          <div class="top10-stat-box"><div class="tsb-val">${item.year || '—'}</div><div class="tsb-lbl">Année</div></div>
         </div>
         <div class="top10-actions">
           <button class="icon-btn" data-up="${i}" title="Monter" ${i === 0 ? 'disabled' : ''}>▲</button>
