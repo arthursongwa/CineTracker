@@ -312,6 +312,11 @@
     color:var(--color-text-secondary);
     margin-top:2px;
   }
+  .similar-card .sc-status{position:absolute; bottom:8px; right:8px; font-size:10px; font-weight:700; font-family:var(--font-bricolage); padding:2px 7px; border-radius:5px; backdrop-filter:blur(3px); z-index:2;}
+  .similar-card .sc-status.a-voir{background:rgba(200,164,104,0.9); color:var(--color-surface-dark);}
+  .similar-card .sc-status.en-cours{background:rgba(104,156,200,0.9); color:#fff;}
+  .similar-card .sc-status.vu{background:rgba(127,168,120,0.9); color:#fff;}
+  .similar-card .sc-stars{color:var(--color-accent-gold); font-size:11px; margin-top:3px;}
 
   /* ============ TOP 10 ============ */
   .top10-tabs{display:flex; gap:var(--spacing-xs); background:var(--color-background-card); padding:3px; border-radius:var(--radius-tab-button); border:1px solid var(--color-border-subtle);}
@@ -336,8 +341,13 @@
   .reco-card .rc-body{padding:9px 10px 10px;}
   .reco-card .rc-title{font-size:13px; font-weight:600; line-height:1.3; margin-bottom:2px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;}
   .reco-card .rc-sub{font-size:11px; color:var(--color-text-secondary);}
-  .reco-card .rc-add{position:absolute; top:8px; right:8px; width:28px; height:28px; border-radius:50%; border:none; background:rgba(15,13,10,0.78); color:var(--color-accent-gold); font-size:17px; font-weight:700; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(3px);}
+  .reco-card .rc-actions{position:absolute; top:8px; right:8px; display:flex; gap:6px; z-index:2;}
+  .reco-card .rc-add, .reco-card .rc-dislike{width:28px; height:28px; border-radius:50%; border:none; background:rgba(15,13,10,0.78); font-size:15px; font-weight:700; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(3px); flex-shrink:0;}
+  .reco-card .rc-add{color:var(--color-accent-gold); font-size:17px;}
   .reco-card .rc-add:hover{background:var(--color-accent-gold); color:var(--color-surface-dark);}
+  .reco-card .rc-dislike{color:var(--color-danger);}
+  .reco-card .rc-dislike:hover{background:var(--color-danger); color:#fff;}
+  .reco-card .rc-dislike.active{background:var(--color-danger); color:#fff;}
   .reco-card .rc-type{position:absolute; top:8px; left:8px; background:rgba(15,13,10,0.78); color:var(--color-text-primary); font-size:10px; font-weight:700; font-family:var(--font-bricolage); padding:2px 7px; border-radius:5px; backdrop-filter:blur(3px);}
 
   /* ============ COLLECTION ============ */
@@ -358,7 +368,9 @@
   .lib-card .lc-body{padding:10px 12px 12px;}
   .lib-card .lc-title{font-size:13.5px; font-weight:600; line-height:1.3; margin-bottom:2px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; cursor:pointer;}
   .lib-card .lc-year{font-size:12px; color:var(--color-text-secondary); margin-bottom:6px;}
-  .lib-card .user-stars{color:var(--color-accent-gold); font-size:12px; margin-bottom:6px;}
+  .lib-card .user-stars{color:var(--color-accent-gold); font-size:15px; margin-bottom:6px; letter-spacing:2px;}
+  .lib-card .user-stars .ustar{cursor:pointer; display:inline-block; transition:transform .1s ease;}
+  .lib-card .user-stars .ustar:hover{transform:scale(1.25);}
   .lib-card .series-badge{display:inline-block; background:rgba(104,156,200,0.18); color:var(--color-info); border:1px solid rgba(104,156,200,0.3); padding:2px 6px; border-radius:4px; font-size:10.5px; font-weight:700; margin-bottom:6px; font-family:var(--font-bricolage);}
   .lib-card .anime-badge{display:inline-block; background:rgba(200,164,104,0.18); color:var(--color-accent-gold); border:1px solid rgba(200,164,104,0.3); padding:2px 6px; border-radius:4px; font-size:10.5px; font-weight:700; margin-bottom:6px; font-family:var(--font-bricolage); margin-right:4px;}
   .lc-actions{display:flex; align-items:center; justify-content:space-between; gap:6px;}
@@ -1479,11 +1491,25 @@
         const scard = document.createElement('div');
         scard.className = 'similar-card';
         const simPoster = sim.posterPath ? IMG_W500 + sim.posterPath : '';
+        const inLib = findInLibrary(sim.id);
+        let statusBadge = '';
+        let starsBadge = '';
+        if(inLib){
+          let statusClass = 'a-voir';
+          if(inLib.status === 'Vu') statusClass = 'vu';
+          if(inLib.status === 'En cours') statusClass = 'en-cours';
+          statusBadge = `<div class="sc-status ${statusClass}">${escapeHtml(inLib.status)}</div>`;
+          if(inLib.userRating > 0){
+            starsBadge = `<div class="sc-stars">${'★'.repeat(inLib.userRating)}${'☆'.repeat(5 - inLib.userRating)}</div>`;
+          }
+        }
         scard.innerHTML = `
+          ${statusBadge}
           <img src="${simPoster}" alt="${escapeHtml(sim.title)}" loading="lazy">
           <div class="sc-body">
             <div class="sc-title">${escapeHtml(sim.title)}</div>
             <div class="sc-year">${sim.year}</div>
+            ${starsBadge}
           </div>
         `;
         scard.addEventListener('click', () => selectMedia(sim.id, sim.mediaType));
@@ -1573,19 +1599,27 @@
     renderHero();
   });
 
-  el('btnHeroDislike').addEventListener('click', async () => {
-    if(!selectedMovie) return;
-    const idStr = String(selectedMovie.tmdbId);
+  async function toggleDislike(id){
+    const idStr = String(id);
+    let nowDisliked;
     if(state.disliked.includes(idStr)){
-      state.disliked = state.disliked.filter(id => id !== idStr);
+      state.disliked = state.disliked.filter(x => x !== idStr);
+      nowDisliked = false;
     } else {
       state.disliked.push(idStr);
       state.library = state.library.filter(x => String(x.tmdbId) !== idStr);
+      nowDisliked = true;
     }
     await persist();
-    renderHero();
     renderLibrary();
     loadCalendarData();
+    if(selectedMovie && String(selectedMovie.tmdbId) === idStr) renderHero();
+    return nowDisliked;
+  }
+
+  el('btnHeroDislike').addEventListener('click', async () => {
+    if(!selectedMovie) return;
+    await toggleDislike(selectedMovie.tmdbId);
   });
 
   /* =========================================================
@@ -2189,7 +2223,10 @@
 
         card.innerHTML = `
           <span class="rc-type">${typeLabel}</span>
-          <button class="rc-add" data-quickadd="${item.tmdbId}" data-type="${item.mediaType}" title="Ajouter à ma collection">＋</button>
+          <div class="rc-actions">
+            <button class="rc-dislike" data-dislike="${item.tmdbId}" title="Je n'aime pas">👎</button>
+            <button class="rc-add" data-quickadd="${item.tmdbId}" data-type="${item.mediaType}" title="Ajouter à ma collection">＋</button>
+          </div>
           <img src="${poster}" alt="${escapeHtml(item.title)}" loading="lazy">
           <div class="rc-body">
             <div class="rc-title">${escapeHtml(item.title)}</div>
@@ -2199,7 +2236,7 @@
         `;
 
         card.addEventListener('click', (e) => {
-          if(e.target.closest('[data-quickadd]')) return;
+          if(e.target.closest('[data-quickadd]') || e.target.closest('[data-dislike]')) return;
           selectMedia(item.tmdbId, item.mediaType);
         });
 
@@ -2225,6 +2262,15 @@
             btn.disabled = false;
             btn.textContent = '＋';
           }
+        });
+      });
+
+      grid.querySelectorAll('[data-dislike]').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          btn.disabled = true;
+          await toggleDislike(btn.dataset.dislike);
+          generateJSRecommendations();
         });
       });
 
@@ -2618,7 +2664,7 @@
       const cat = categoryOf(m);
       const rank = state.top10[cat].indexOf(String(m.tmdbId));
 
-      const starsHtml = m.userRating > 0 ? `<div class="user-stars">${'★'.repeat(m.userRating)}${'☆'.repeat(5 - m.userRating)}</div>` : '';
+      const starsHtml = `<div class="user-stars" data-id="${m.tmdbId}">${[1,2,3,4,5].map(v => `<span class="ustar" data-val="${v}">${v <= (m.userRating || 0) ? '★' : '☆'}</span>`).join('')}</div>`;
       let seriesBadgeHtml = '';
       if(m.mediaType === 'tv'){
         const s = String(m.season || 1).padStart(2, '0');
@@ -2655,6 +2701,26 @@
     grid.querySelectorAll('.status-chip').forEach(btn => btn.addEventListener('click', () => cycleStatus(btn.dataset.id)));
     grid.querySelectorAll('[data-top10]').forEach(btn => btn.addEventListener('click', () => toggleTop10(btn.dataset.top10)));
     grid.querySelectorAll('[data-del]').forEach(btn => btn.addEventListener('click', () => deleteMovie(btn.dataset.del)));
+    grid.querySelectorAll('.user-stars').forEach(starsDiv => {
+      starsDiv.querySelectorAll('.ustar').forEach(starEl => {
+        starEl.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const id = starsDiv.dataset.id;
+          const val = parseInt(starEl.dataset.val);
+          const m = findInLibrary(id);
+          if(!m) return;
+          m.userRating = (m.userRating === val) ? 0 : val;
+          m.updatedAt = Date.now();
+          await persist();
+          renderLibrary();
+          renderTop10();
+          if(selectedMovie && String(selectedMovie.tmdbId) === String(id)){
+            selectedMovie.userRating = m.userRating;
+            updateStarUI(m.userRating);
+          }
+        });
+      });
+    });
 
     el('libLoadMoreRow').style.display = filtered.length > visible.length ? 'flex' : 'none';
   }
