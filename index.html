@@ -313,9 +313,9 @@
     margin-top:2px;
   }
   .similar-card .sc-status{position:absolute; bottom:8px; right:8px; font-size:10px; font-weight:700; font-family:var(--font-bricolage); padding:2px 7px; border-radius:5px; backdrop-filter:blur(3px); z-index:2;}
-  .similar-card .sc-status.a-voir{background:rgba(200,164,104,0.9); color:var(--color-surface-dark);}
-  .similar-card .sc-status.en-cours{background:rgba(104,156,200,0.9); color:#fff;}
-  .similar-card .sc-status.vu{background:rgba(127,168,120,0.9); color:#fff;}
+  .similar-card .sc-status.a-voir{background:rgba(200,164,104,0.16); color:var(--color-accent-gold);}
+  .similar-card .sc-status.en-cours{background:rgba(104,156,200,0.18); color:var(--color-info);}
+  .similar-card .sc-status.vu{background:rgba(127,168,120,0.18); color:var(--color-success);}
   .similar-card .sc-stars{color:var(--color-accent-gold); font-size:11px; margin-top:3px;}
 
   /* ============ TOP 10 ============ */
@@ -2664,7 +2664,7 @@
       const cat = categoryOf(m);
       const rank = state.top10[cat].indexOf(String(m.tmdbId));
 
-      const starsHtml = `<div class="user-stars" data-id="${m.tmdbId}">${[1,2,3,4,5].map(v => `<span class="ustar" data-val="${v}">${v <= (m.userRating || 0) ? '★' : '☆'}</span>`).join('')}</div>`;
+      const starsHtml = m.status === 'Vu' ? `<div class="user-stars" data-id="${m.tmdbId}">${[1,2,3,4,5].map(v => `<span class="ustar" data-val="${v}">${v <= (m.userRating || 0) ? '★' : '☆'}</span>`).join('')}</div>` : '';
       let seriesBadgeHtml = '';
       if(m.mediaType === 'tv'){
         const s = String(m.season || 1).padStart(2, '0');
