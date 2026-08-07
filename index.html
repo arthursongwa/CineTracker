@@ -1426,7 +1426,13 @@
 
   async function fetchTvEvents(item){
     if(state.calendarCache[`tv_${item.tmdbId}`]){
-      return state.calendarCache[`tv_${item.tmdbId}`];
+      // Le cache ne stocke que des données brutes (dates) : le statut upcoming/available
+      // est toujours recalculé par rapport à la date du jour pour rester à jour.
+      const todayStr = getLocalDateString();
+      return state.calendarCache[`tv_${item.tmdbId}`].map(ev => ({
+        ...ev,
+        type: ev.date > todayStr ? 'upcoming' : 'available'
+      }));
     }
 
     const events = [];
@@ -1465,7 +1471,16 @@
 
   async function fetchMovieEvent(item){
     if(state.calendarCache[`movie_${item.tmdbId}`]){
-      return state.calendarCache[`movie_${item.tmdbId}`];
+      // Idem : on recalcule le statut à chaque lecture du cache plutôt que de garder
+      // la valeur figée au moment du premier fetch.
+      const cached = state.calendarCache[`movie_${item.tmdbId}`];
+      const todayStr = getLocalDateString();
+      const isUpcoming = cached.date >= todayStr;
+      return {
+        ...cached,
+        type: isUpcoming ? 'movie' : 'available',
+        subText: isUpcoming ? 'Sortie à venir' : 'Sorti en salle/VOD'
+      };
     }
 
     let dateStr = item.releaseDate && item.releaseDate.length >= 10 ? item.releaseDate.slice(0, 10) : null;
