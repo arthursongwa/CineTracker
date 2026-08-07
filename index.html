@@ -335,6 +335,48 @@
 
   /* ============ RECOMMENDATIONS (JS) ============ */
   .reco-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:var(--spacing-lg);}
+
+  /* ============ STATISTIQUES ============ */
+  .stats-blocks{display:grid; grid-template-columns:repeat(auto-fit, minmax(360px, 1fr)); gap:var(--spacing-lg);}
+  .stats-block{background:var(--color-background-card); border:1px solid var(--color-border-subtle); border-radius:var(--radius-card); padding:var(--spacing-xl); display:flex; flex-direction:column; gap:var(--spacing-md);}
+  .stats-block.full{grid-column:1 / -1;}
+  .stats-block-title{font-family:var(--font-playfair); font-weight:700; font-size:16px; color:var(--color-text-primary); display:flex; align-items:center; gap:8px;}
+  .stats-block-sub{font-size:11.5px; color:var(--color-text-secondary); margin-top:-6px;}
+  .stats-empty{color:var(--color-text-secondary); font-size:13px; text-align:center; padding:var(--spacing-xl) 0;}
+
+  .bar-row{display:flex; align-items:center; gap:10px; font-size:12.5px;}
+  .bar-row .bar-label{width:120px; flex-shrink:0; color:var(--color-text-primary); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .bar-row .bar-track{flex:1; height:10px; background:rgba(200,180,150,0.1); border-radius:999px; overflow:hidden;}
+  .bar-row .bar-fill{height:100%; border-radius:999px; background:linear-gradient(90deg, var(--color-accent-gold), #8a6a3e);}
+  .bar-row .bar-value{width:34px; flex-shrink:0; text-align:right; color:var(--color-text-secondary); font-weight:600; font-size:11.5px;}
+  .bar-row.rating .bar-fill{background:linear-gradient(90deg, #689cc8, #7fa878);}
+
+  .stats-kpis{display:grid; grid-template-columns:repeat(auto-fit, minmax(120px, 1fr)); gap:var(--spacing-md);}
+  .stats-kpi{background:rgba(15,13,10,0.4); border:1px solid var(--color-border-subtle); border-radius:var(--radius-base); padding:12px 14px; text-align:center;}
+  .stats-kpi .kpi-val{font-family:var(--font-playfair); font-weight:700; font-size:21px; color:var(--color-accent-gold); line-height:1.2;}
+  .stats-kpi .kpi-label{font-size:10.5px; color:var(--color-text-muted); text-transform:uppercase; letter-spacing:0.8px; font-weight:600; margin-top:2px;}
+
+  .donut-wrap{display:flex; align-items:center; gap:var(--spacing-xl); flex-wrap:wrap;}
+  .donut-legend{display:flex; flex-direction:column; gap:8px; flex:1; min-width:160px;}
+  .donut-legend-item{display:flex; align-items:center; gap:8px; font-size:12.5px;}
+  .donut-legend-dot{width:10px; height:10px; border-radius:3px; flex-shrink:0;}
+  .donut-legend-label{flex:1; color:var(--color-text-primary);}
+  .donut-legend-value{color:var(--color-text-secondary); font-weight:600; font-size:11.5px;}
+
+  .month-chart{display:flex; align-items:flex-end; gap:4px; height:110px; padding-top:6px;}
+  .month-col{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; gap:6px; height:100%;}
+  .month-col .month-bar{width:100%; max-width:22px; border-radius:4px 4px 0 0; background:linear-gradient(180deg, var(--color-accent-gold), #8a6a3e); min-height:2px;}
+  .month-col .month-label{font-size:9.5px; color:var(--color-text-muted); writing-mode:horizontal-tb; white-space:nowrap;}
+
+  .podium-list{display:flex; flex-direction:column; gap:8px;}
+  .podium-item{display:flex; align-items:center; gap:10px; background:rgba(15,13,10,0.35); border:1px solid var(--color-border-subtle); border-radius:var(--radius-base); padding:8px 10px;}
+  .podium-rank{font-family:var(--font-playfair); font-weight:700; color:var(--color-accent-gold); width:20px; text-align:center; flex-shrink:0; font-size:14px;}
+  .podium-poster{width:32px; height:46px; object-fit:cover; border-radius:5px; background:var(--color-surface-dark); flex-shrink:0; cursor:pointer;}
+  .podium-info{flex:1; min-width:0;}
+  .podium-title{font-size:12.5px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer;}
+  .podium-sub{font-size:11px; color:var(--color-text-secondary);}
+  .podium-score{font-size:12px; font-weight:700; color:var(--color-accent-gold); flex-shrink:0; white-space:nowrap;}
+
   .reco-card{background:var(--color-background-card); border:1px solid var(--color-border-subtle); border-radius:var(--radius-card); overflow:hidden; position:relative; transition:transform .15s ease, border-color .15s ease; cursor:pointer;}
   .reco-card:hover{transform:translateY(-3px); border-color:var(--color-accent-gold);}
   .reco-card img{width:100%; aspect-ratio:2/3; object-fit:cover; display:block; background:var(--color-surface-dark);}
@@ -440,6 +482,7 @@
     <a href="#section-calendar">📅 Calendrier</a>
     <a href="#section-top10">🏆 Top 10</a>
     <a href="#section-reco">✨ Recommandations</a>
+    <a href="#section-stats">📊 Statistiques</a>
   </nav>
 
   <!-- ============ DASHBOARD ============ -->
@@ -657,6 +700,18 @@
     <div id="recoGrid" class="reco-grid"></div>
   </section>
 
+  <!-- ============ STATISTIQUES ============ -->
+  <section class="section page" id="section-stats">
+    <div class="section-header">
+      <div>
+        <div class="section-eyebrow">Analyse de ta collection</div>
+        <h2 class="section-title">Statistiques</h2>
+        <div class="section-sub">Une vue en profondeur sur ce que tu regardes, notes et aimes.</div>
+      </div>
+    </div>
+    <div id="statsContent"></div>
+  </section>
+
 </div>
 
 <!-- ============ MODAL (RÉGLAGES, IMPORT & BUGS) ============ -->
@@ -765,7 +820,7 @@
   /* =========================================================
      NAVIGATION MULTI-PAGES
   ========================================================= */
-  const PAGE_IDS = ['section-collection', 'section-search', 'section-calendar', 'section-top10', 'section-reco'];
+  const PAGE_IDS = ['section-collection', 'section-search', 'section-calendar', 'section-top10', 'section-reco', 'section-stats'];
 
   function showPage(pageId, opts){
     opts = opts || {};
@@ -782,6 +837,9 @@
     
     if(pageId === 'section-reco'){
       generateJSRecommendations();
+    }
+    if(pageId === 'section-stats'){
+      renderStatsPage();
     }
   }
 
@@ -957,6 +1015,258 @@
     el('statAvgRating').textContent = `${avgRating} / 5 ⭐`;
     el('statRatedCount').textContent = `${ratedList.length} contenu(s) noté(s)`;
   }
+
+  /* =========================================================
+     PAGE STATISTIQUES — analyse profonde de la collection
+  ========================================================= */
+  const DONUT_COLORS = ['#c8a468', '#689cc8', '#7fa878', '#c76b5e', '#a98cc7', '#c7a45e', '#5ea9a1'];
+
+  function statsBlock(title, sub, bodyHtml, opts){
+    opts = opts || {};
+    return `
+      <div class="stats-block ${opts.full ? 'full' : ''}">
+        <div class="stats-block-title">${title}</div>
+        ${sub ? `<div class="stats-block-sub">${sub}</div>` : ''}
+        ${bodyHtml}
+      </div>
+    `;
+  }
+
+  function barRow(label, value, max, valueLabel, extraClass){
+    const pct = max > 0 ? Math.max(2, Math.round((value / max) * 100)) : 0;
+    return `
+      <div class="bar-row ${extraClass || ''}">
+        <div class="bar-label" title="${escapeHtml(label)}">${escapeHtml(label)}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+        <div class="bar-value">${valueLabel != null ? valueLabel : value}</div>
+      </div>
+    `;
+  }
+
+  function buildDonutSVG(segments){
+    // segments: [{label, value, color}]
+    const total = segments.reduce((s, x) => s + x.value, 0);
+    if(total === 0) return '';
+    const r = 42, cx = 50, cy = 50, circumference = 2 * Math.PI * r;
+    let offset = 0;
+    const circles = segments.map(seg => {
+      const frac = seg.value / total;
+      const dash = frac * circumference;
+      const gap = circumference - dash;
+      const circle = `<circle r="${r}" cx="${cx}" cy="${cy}" fill="none" stroke="${seg.color}" stroke-width="14" stroke-dasharray="${dash} ${gap}" stroke-dashoffset="${-offset}" transform="rotate(-90 ${cx} ${cy})"></circle>`;
+      offset += dash;
+      return circle;
+    }).join('');
+    return `<svg viewBox="0 0 100 100" width="130" height="130">${circles}</svg>`;
+  }
+
+  function renderStatsPage(){
+    const container = el('statsContent');
+    if(!container) return;
+    const lib = state.library;
+
+    if(lib.length === 0){
+      container.innerHTML = '<div class="stats-empty">Ajoute des titres à ta collection pour voir tes statistiques.</div>';
+      return;
+    }
+
+    /* ---------- KPIs globaux ---------- */
+    const watched = lib.filter(m => m.status === 'Vu');
+    const inProgress = lib.filter(m => m.status === 'En cours');
+    const pending = lib.filter(m => m.status === 'À voir');
+    const rated = lib.filter(m => m.userRating > 0);
+    const avgUserRating = rated.length ? (rated.reduce((s, m) => s + m.userRating, 0) / rated.length) : 0;
+    const avgTmdbRating = lib.filter(m => m.rating > 0).length
+      ? lib.filter(m => m.rating > 0).reduce((s, m) => s + m.rating, 0) / lib.filter(m => m.rating > 0).length
+      : 0;
+    const disliked = (state.disliked || []).length;
+    const seriesInLib = lib.filter(m => m.mediaType === 'tv');
+    const totalEpisodesTracked = seriesInLib.reduce((s, m) => s + (m.status === 'Vu' ? 1 : (m.episode || 1)), 0);
+
+    const kpisHtml = `
+      <div class="stats-kpis">
+        <div class="stats-kpi"><div class="kpi-val">${lib.length}</div><div class="kpi-label">Titres au total</div></div>
+        <div class="stats-kpi"><div class="kpi-val">${watched.length}</div><div class="kpi-label">Vus (${lib.length ? Math.round(watched.length / lib.length * 100) : 0}%)</div></div>
+        <div class="stats-kpi"><div class="kpi-val">${avgUserRating ? avgUserRating.toFixed(1) : '—'}</div><div class="kpi-label">Note moyenne perso</div></div>
+        <div class="stats-kpi"><div class="kpi-val">${avgTmdbRating ? avgTmdbRating.toFixed(1) : '—'}</div><div class="kpi-label">Note TMDB moyenne</div></div>
+        <div class="stats-kpi"><div class="kpi-val">${rated.length}</div><div class="kpi-label">Titres notés</div></div>
+        <div class="stats-kpi"><div class="kpi-val">${disliked}</div><div class="kpi-label">Titres "pas aimé"</div></div>
+      </div>
+    `;
+
+    /* ---------- Répartition par type (donut) ---------- */
+    const movies = lib.filter(m => m.mediaType === 'movie').length;
+    const tvOnly = lib.filter(m => m.mediaType === 'tv' && !m.isAnime).length;
+    const animes = lib.filter(m => m.isAnime).length;
+    const typeSegments = [
+      { label: 'Films', value: movies, color: DONUT_COLORS[0] },
+      { label: 'Séries', value: tvOnly, color: DONUT_COLORS[1] },
+      { label: 'Animes', value: animes, color: DONUT_COLORS[2] },
+    ].filter(s => s.value > 0);
+    const typeDonut = `
+      <div class="donut-wrap">
+        ${buildDonutSVG(typeSegments)}
+        <div class="donut-legend">
+          ${typeSegments.map(s => `
+            <div class="donut-legend-item">
+              <span class="donut-legend-dot" style="background:${s.color}"></span>
+              <span class="donut-legend-label">${s.label}</span>
+              <span class="donut-legend-value">${s.value} (${Math.round(s.value / lib.length * 100)}%)</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+
+    /* ---------- Répartition par statut (donut) ---------- */
+    const statusSegments = [
+      { label: 'Vu', value: watched.length, color: DONUT_COLORS[2] },
+      { label: 'En cours', value: inProgress.length, color: DONUT_COLORS[1] },
+      { label: 'À voir', value: pending.length, color: DONUT_COLORS[0] },
+    ].filter(s => s.value > 0);
+    const statusDonut = `
+      <div class="donut-wrap">
+        ${buildDonutSVG(statusSegments)}
+        <div class="donut-legend">
+          ${statusSegments.map(s => `
+            <div class="donut-legend-item">
+              <span class="donut-legend-dot" style="background:${s.color}"></span>
+              <span class="donut-legend-label">${s.label}</span>
+              <span class="donut-legend-value">${s.value} (${Math.round(s.value / lib.length * 100)}%)</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+
+    /* ---------- Top genres ---------- */
+    const genreCounts = new Map();
+    lib.forEach(m => (m.genres || []).forEach(g => genreCounts.set(g, (genreCounts.get(g) || 0) + 1)));
+    const topGenres = [...genreCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
+    const maxGenre = topGenres.length ? topGenres[0][1] : 0;
+    const genresHtml = topGenres.length
+      ? topGenres.map(([g, c]) => barRow(g, c, maxGenre)).join('')
+      : '<div class="stats-empty">Pas encore de genres enregistrés.</div>';
+
+    /* ---------- Genres les mieux notés (affinité) ---------- */
+    const genreRatingSum = new Map(), genreRatingCount = new Map();
+    rated.forEach(m => (m.genres || []).forEach(g => {
+      genreRatingSum.set(g, (genreRatingSum.get(g) || 0) + m.userRating);
+      genreRatingCount.set(g, (genreRatingCount.get(g) || 0) + 1);
+    }));
+    const genreAffinityList = [...genreRatingCount.entries()]
+      .filter(([, count]) => count >= 2)
+      .map(([g, count]) => ({ genre: g, avg: genreRatingSum.get(g) / count, count }))
+      .sort((a, b) => b.avg - a.avg)
+      .slice(0, 8);
+    const genreAffinityHtml = genreAffinityList.length
+      ? genreAffinityList.map(x => barRow(`${x.genre} (${x.count})`, x.avg, 5, x.avg.toFixed(1), 'rating')).join('')
+      : '<div class="stats-empty">Note au moins 2 titres par genre pour voir tes affinités.</div>';
+
+    /* ---------- Top réalisateurs ---------- */
+    const dirCounts = new Map();
+    lib.forEach(m => { if(m.director && m.director !== 'Inconnu') dirCounts.set(m.director, (dirCounts.get(m.director) || 0) + 1); });
+    const topDirectors = [...dirCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
+    const maxDir = topDirectors.length ? topDirectors[0][1] : 0;
+    const directorsHtml = topDirectors.length
+      ? topDirectors.map(([d, c]) => barRow(d, c, maxDir)).join('')
+      : '<div class="stats-empty">Pas assez de données sur les réalisateurs.</div>';
+
+    /* ---------- Distribution des notes perso (1-5) ---------- */
+    const ratingDist = [1, 2, 3, 4, 5].map(v => rated.filter(m => m.userRating === v).length);
+    const maxRatingDist = Math.max(1, ...ratingDist);
+    const ratingDistHtml = rated.length
+      ? [5, 4, 3, 2, 1].map(v => barRow('★'.repeat(v), ratingDist[v - 1], maxRatingDist)).join('')
+      : '<div class="stats-empty">Note quelques titres pour voir la distribution.</div>';
+
+    /* ---------- Décennies ---------- */
+    const decadeCounts = new Map();
+    lib.forEach(m => {
+      const y = parseInt(m.year, 10);
+      if(!y || isNaN(y)) return;
+      const decade = Math.floor(y / 10) * 10;
+      decadeCounts.set(decade, (decadeCounts.get(decade) || 0) + 1);
+    });
+    const decadesSorted = [...decadeCounts.entries()].sort((a, b) => a[0] - b[0]);
+    const maxDecade = decadesSorted.length ? Math.max(...decadesSorted.map(x => x[1])) : 0;
+    const decadesHtml = decadesSorted.length
+      ? decadesSorted.map(([d, c]) => barRow(`${d}s`, c, maxDecade)).join('')
+      : '<div class="stats-empty">Pas assez de dates de sortie connues.</div>';
+
+    /* ---------- Activité : ajouts par mois (12 derniers mois) ---------- */
+    const now = new Date();
+    const months = [];
+    for(let i = 11; i >= 0; i--){
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      months.push({ key: `${d.getFullYear()}-${d.getMonth()}`, label: d.toLocaleDateString('fr-FR', { month: 'short' }), count: 0 });
+    }
+    lib.forEach(m => {
+      const d = new Date(m.addedAt || Date.now());
+      const key = `${d.getFullYear()}-${d.getMonth()}`;
+      const slot = months.find(x => x.key === key);
+      if(slot) slot.count++;
+    });
+    const maxMonth = Math.max(1, ...months.map(x => x.count));
+    const monthChartHtml = `
+      <div class="month-chart">
+        ${months.map(mo => `
+          <div class="month-col">
+            <div class="month-bar" style="height:${Math.max(2, Math.round(mo.count / maxMonth * 100))}%" title="${mo.count} ajout(s)"></div>
+            <div class="month-label">${mo.label}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+
+    /* ---------- Podiums : mieux notés / dernières notes ---------- */
+    const bestRated = [...rated].sort((a, b) => b.userRating - a.userRating || b.updatedAt - a.updatedAt).slice(0, 5);
+    const bestRatedHtml = bestRated.length ? `
+      <div class="podium-list">
+        ${bestRated.map((m, i) => `
+          <div class="podium-item">
+            <div class="podium-rank">${i + 1}</div>
+            <img class="podium-poster" src="${m.posterPath ? IMG_W500 + m.posterPath : ''}" alt="${escapeHtml(m.title)}" data-statsopen="${m.tmdbId}" loading="lazy">
+            <div class="podium-info">
+              <div class="podium-title" data-statsopen="${m.tmdbId}">${escapeHtml(m.title)}</div>
+              <div class="podium-sub">${m.year || 'N/A'} · ${escapeHtml(m.director || 'Inconnu')}</div>
+            </div>
+            <div class="podium-score">${'★'.repeat(m.userRating)}</div>
+          </div>
+        `).join('')}
+      </div>
+    ` : '<div class="stats-empty">Note des titres pour voir ton classement.</div>';
+
+    /* ---------- Séries : progression ---------- */
+    const seriesStatsHtml = seriesInLib.length ? `
+      <div class="stats-kpis">
+        <div class="stats-kpi"><div class="kpi-val">${seriesInLib.length}</div><div class="kpi-label">Séries suivies</div></div>
+        <div class="stats-kpi"><div class="kpi-val">${seriesInLib.filter(m => m.status === 'En cours').length}</div><div class="kpi-label">En cours</div></div>
+        <div class="stats-kpi"><div class="kpi-val">${seriesInLib.filter(m => m.status === 'Vu').length}</div><div class="kpi-label">Terminées</div></div>
+        <div class="stats-kpi"><div class="kpi-val">${totalEpisodesTracked}</div><div class="kpi-label">Épisodes suivis (approx.)</div></div>
+      </div>
+    ` : '<div class="stats-empty">Aucune série dans ta collection.</div>';
+
+    container.innerHTML = `
+      <div class="stats-blocks">
+        ${statsBlock('📦 Vue d\'ensemble', null, kpisHtml, { full: true })}
+        ${statsBlock('🎬 Types de contenu', null, typeDonut)}
+        ${statsBlock('📺 Statut de visionnage', null, statusDonut)}
+        ${statsBlock('🎭 Genres les plus présents', 'Top 8 dans ta collection', genresHtml)}
+        ${statsBlock('💛 Genres que tu préfères', 'Note moyenne par genre (min. 2 titres notés)', genreAffinityHtml)}
+        ${statsBlock('🎥 Réalisateurs les plus présents', 'Top 8 dans ta collection', directorsHtml)}
+        ${statsBlock('⭐ Distribution de tes notes', null, ratingDistHtml)}
+        ${statsBlock('🗓️ Répartition par décennie', 'Selon l\'année de sortie', decadesHtml)}
+        ${statsBlock('📈 Activité récente', 'Titres ajoutés par mois (12 derniers mois)', monthChartHtml, { full: true })}
+        ${statsBlock('🏆 Tes coups de cœur', 'Les 5 titres les mieux notés', bestRatedHtml)}
+        ${statsBlock('📺 Progression séries', null, seriesStatsHtml)}
+      </div>
+    `;
+
+    container.querySelectorAll('[data-statsopen]').forEach(nodeEl => {
+      nodeEl.addEventListener('click', () => reopenFromLibrary(nodeEl.dataset.statsopen));
+    });
+  }
+
 
   /* =========================================================
      CALENDRIER
