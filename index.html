@@ -1790,6 +1790,7 @@
   const RERANK_POOL_SIZE = 40;    // nb de candidats enrichis en étape 2
   const FINAL_RECO_COUNT = 20;
   const MIN_VOTES_BAYESIAN = 80;  // "m" du score bayésien (évite les pépites à 2 votes)
+  const AUTOTUNE_MAX_SAMPLE = 60; // taille max de l'échantillon pour l'auto-tuning (perf sur grosses collections)
 
   /* -------------------------------------------------------------------------
      1. UTILITAIRES TEXTE — TF-IDF maison (proxy de similarité sémantique)
@@ -2309,13 +2310,47 @@
   }
 
   /* -------------------------------------------------------------------------
+     1bis. Échantillonnage stratifié — préserve la répartition des notes
+     (1★..5★) même en réduisant fortement la taille de l'échantillon.
+     ------------------------------------------------------------------------- */
+  function stratifiedSample(items, maxSize){
+    if(items.length <= maxSize) return items;
+    const buckets = new Map();
+    items.forEach(it => {
+      const r = it.userRating;
+      if(!buckets.has(r)) buckets.set(r, []);
+      buckets.get(r).push(it);
+    });
+    const ratio = maxSize / items.length;
+    let result = [];
+    buckets.forEach(arr => {
+      const shuffled = [...arr].sort(() => Math.random() - 0.5);
+      const take = Math.max(1, Math.round(arr.length * ratio));
+      result.push(...shuffled.slice(0, take));
+    });
+    if(result.length > maxSize){
+      result = result.sort(() => Math.random() - 0.5).slice(0, maxSize);
+    }
+    return result;
+  }
+
+  /* -------------------------------------------------------------------------
      2. Préparation des données (une seule fois, réutilisées à chaque essai)
      ------------------------------------------------------------------------- */
-  async function prepareBacktestData(){
-    const rated = state.library.filter(m => m.userRating > 0 && m.overview);
+  async function prepareBacktestData(maxSample = AUTOTUNE_MAX_SAMPLE){
+    const allRated = state.library.filter(m => m.userRating > 0 && m.overview);
+    if(allRated.length < 12){
+      return { enriched: [], total: allRated.length };
+    }
+
+    // On échantillonne AVANT d'aller chercher les mots-clés TMDB (1 requête
+    // réseau par film) : avec 400+ films notés, ça évite des centaines
+    // d'appels API inutiles à chaque optimisation.
+    const rated = stratifiedSample(allRated, maxSample);
+
     const idf = buildIdf(rated.map(m => tokenize(m.overview)));
 
-    // Récupère (et met en cache) les mots-clés de tous les films notés
+    // Récupère (et met en cache) les mots-clés des films de l'échantillon
     await Promise.all(rated.map(m => fetchKeywords(m.tmdbId, m.mediaType)));
 
     const enriched = rated.map(m => ({
@@ -2330,7 +2365,7 @@
       updatedAt: m.updatedAt || m.addedAt || Date.now(),
     }));
 
-    return enriched;
+    return { enriched, total: allRated.length };
   }
 
   /* -------------------------------------------------------------------------
@@ -2414,17 +2449,14 @@
      5. Recherche : recuit simulé avec redémarrages aléatoires
      ------------------------------------------------------------------------- */
   async function optimizeRecoWeights(options = {}){
-    const { iterations = 200, restarts = 3, onProgress = null } = options;
+    const { iterations = 180, restarts = 3, onProgress = null } = options;
 
-    const enriched = await prepareBacktestData();
-    if(enriched.length < 12){
-      return { success: false, reason: 'not-enough-data', minRequired: 12, current: enriched.length };
+    const { enriched, total } = await prepareBacktestData();
+    if(total < 12){
+      return { success: false, reason: 'not-enough-data', minRequired: 12, current: total };
     }
 
-    // Echantillonne si la bibliothèque notée est très grande (perf)
-    const sample = enriched.length > 150
-      ? [...enriched].sort(() => Math.random() - 0.5).slice(0, 150)
-      : enriched;
+    const sample = enriched; // déjà échantillonné (stratifié) dans prepareBacktestData
 
     let bestWeights = normalizeWeights({ ...RECO_WEIGHTS });
     let bestScore = evaluateWeights(sample, bestWeights);
@@ -2466,6 +2498,7 @@
       baselineAccuracy: baselineScore,
       improvement: bestScore - baselineScore,
       sampleSize: sample.length,
+      totalRated: total,
     };
   }
 
@@ -2477,7 +2510,7 @@
     setStatus('Analyse de tes notes en cours…');
 
     const result = await optimizeRecoWeights({
-      iterations: 200,
+      iterations: 180,
       restarts: 3,
       onProgress: ({ restart, totalRestarts, bestScore }) => {
         setStatus(`Optimisation… (passe ${restart + 1}/${totalRestarts}, précision actuelle : ${(bestScore * 100).toFixed(1)}%)`);
@@ -2494,7 +2527,10 @@
     await persist();
 
     const pct = (v) => (v * 100).toFixed(1) + '%';
-    setStatus(`✓ Poids optimisés sur ${result.sampleSize} films notés : précision ${pct(result.baselineAccuracy)} → ${pct(result.accuracy)}.`);
+    const sampleNote = result.totalRated > result.sampleSize
+      ? ` (échantillon de ${result.sampleSize} sur ${result.totalRated} films notés)`
+      : ` (${result.sampleSize} films notés)`;
+    setStatus(`✓ Poids optimisés${sampleNote} : précision ${pct(result.baselineAccuracy)} → ${pct(result.accuracy)}.`);
 
     generateJSRecommendations();
   }
