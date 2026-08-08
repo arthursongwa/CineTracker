@@ -1843,7 +1843,7 @@
 
     let youtubeSearchFallbackKey = null;
     if(!trailer){
-      youtubeSearchFallbackKey = `YT_SEARCH:${d.title || d.name || ''} bande annonce`;
+      youtubeSearchFallbackKey = `YT_SEARCH:${d.title || d.name || ''} bande annonce VF`;
     }
 
     let rawSimilar = [...(d.similar?.results || []), ...(d.recommendations?.results || [])];
